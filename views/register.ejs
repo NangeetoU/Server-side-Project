@@ -1,0 +1,51 @@
+<%- include('partials/header') %>
+
+<div class="page-wrapper-center">
+    <div class="register-card">
+        <h1 class="dodash-title text-center">DoDash</h1>
+        <h2 class="sign-in-title text-center">Create Account</h2>
+
+        <form action="/register" method="POST">
+            <div class="row">
+                <!-- Row 1 -->
+                <div class="col-md-6 mb-3">
+                    <input type="text" class="form-control" placeholder="Enter first name" name="firstName" required>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <input type="text" class="form-control" placeholder="Enter last name" name="lastName" required>
+                </div>
+
+                <!-- Row 2 -->
+                <div class="col-md-6 mb-3">
+                    <input type="text" class="form-control" placeholder="Enter username" name="username" required>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <input type="email" class="form-control" placeholder="Enter email" name="email" required>
+                </div>
+
+                <!-- Row 3 -->
+                <div class="col-md-6 mb-4">
+                    <input type="password" class="form-control" placeholder="Enter password" name="password" required>
+                </div>
+                <div class="col-md-6 mb-4">
+                    <input type="password" class="form-control" placeholder="Confirm password" name="confirmPassword" required>
+                </div>
+            </div>
+
+            <div class="form-check mb-4">
+                <input class="form-check-input" type="checkbox" value="" id="agreeTerms" name="agreeTerms" required>
+                <label class="form-check-label" for="agreeTerms">
+                    I agree to the <a href="#" class="text-warning">Terms & Conditions</a>
+                </label>
+            </div>
+
+            <button type="submit" class="btn btn-warning w-100 fw-bold">Create</button>
+        </form>
+
+        <p class="mt-4 text-center create-account-text">
+            Already have an account? <a href="/login" class="text-warning">Sign In</a>
+        </p>
+    </div>
+</div>
+
+<%- include('partials/footer') %>

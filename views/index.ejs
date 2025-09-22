@@ -1,0 +1,23 @@
+<%- include('partials/header') %>
+
+<main class="container-fluid d-flex justify-content-center align-items-center">
+
+    <div class="main-card rounded-4 shadow-lg">
+
+        <div class="row">
+            
+            <div class="col-lg-7 text-center text-lg-start">
+                <h1 class="display-3 fw-bold text-warning"><%= heading %></h1>
+                <p class="lead text-white-50 my-4"><%= description %></p>
+                <a href="/login" class="btn btn-warning btn-lg">Start for free</a>
+            </div>
+
+            <div class="col-lg-5 d-none d-lg-block text-center mt-4 mt-lg-0">
+                <img src="/images/Todo-list-pic-firstpage.png" class="img-fluid" alt="To-do list illustration">
+            </div>
+            
+        </div>
+    </div>
+</main>
+
+<%- include('partials/footer') %>

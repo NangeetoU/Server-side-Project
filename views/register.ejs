@@ -1,0 +1,72 @@
+<%- include('partials/header') %>
+
+<div class="page-wrapper-center">
+    <div class="register-card">
+        <h1 class="dodash-title text-center">DoDash</h1>
+        <!-- เปลี่ยนจาก Create Account เป็น Sign up -->
+        <h2 class="sign-in-title text-center">Sign up</h2>
+
+        <form action="/register" method="POST">
+            <div class="row">
+                <!-- Row 1: First Name & Last Name -->
+                <div class="col-md-6 mb-3">
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-user"></i></span>
+                        <input type="text" class="form-control" placeholder="Enter first name" name="firstName" required>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-user"></i></span>
+                        <input type="text" class="form-control" placeholder="Enter last name" name="lastName" required>
+                    </div>
+                </div>
+
+                <!-- Row 2: Username & Email -->
+                <div class="col-md-6 mb-3">
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-at"></i></span>
+                        <input type="text" class="form-control" placeholder="Enter username" name="username" required>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                        <input type="email" class="form-control" placeholder="Enter email" name="email" required>
+                    </div>
+                </div>
+
+                <!-- Row 3: Password & Confirm Password -->
+                <div class="col-md-6 mb-4">
+                     <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                        <input type="password" class="form-control" placeholder="Enter password" name="password" required>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-4">
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                        <input type="password" class="form-control" placeholder="Confirm password" name="confirmPassword" required>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-check mb-4">
+                <input class="form-check-input" type="checkbox" value="" id="agreeTerms" name="agreeTerms" required>
+                <!-- เปลี่ยนข้อความเป็น I agree to all terms -->
+                <label class="form-check-label" for="agreeTerms">
+                    I agree to all terms
+                </label>
+            </div>
+
+            <button type="submit" class="btn btn-warning w-100 fw-bold">Create</button>
+        </form>
+
+        <p class="mt-4 text-center create-account-text">
+            Already have an account? <a href="/login" class="text-warning">Sign In</a>
+        </p>
+    </div>
+</div>
+
+<%- include('partials/footer') %>
+

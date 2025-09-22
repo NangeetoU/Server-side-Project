@@ -1,0 +1,212 @@
+/* ==============================================
+    ตัวแปรสี และการตั้งค่าพื้นฐาน (Global Settings)
+==============================================
+*/
+:root {
+    --dark-blue: #293441;
+    --main-bg: #5A7A9A;
+    --highlight-yellow: #FFD700; 
+}
+
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    overflow-x: hidden;
+}
+
+body {
+    background-color: var(--main-bg);
+    background-image: url('/images/bg-homepage.png');
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
+    box-sizing: border-box;
+    font-family: 'Kanit', sans-serif;
+}
+
+
+/* ==============================================
+    สไตล์สำหรับหน้าแรก (Home Page)
+==============================================
+*/
+.main-card {
+    background-color: var(--dark-blue);
+    width: 70%; 
+    max-width: 1200px;
+    border-radius: 25px;
+    padding: 7rem 6rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+
+.main-card h1 {
+    font-family: 'Jaro', sans-serif;
+    font-size: 5.5rem;
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+    color: var(--highlight-yellow);
+}
+
+.main-card p {
+    font-family: 'JejuHallasan', serif;
+    font-weight: 600;
+    font-size: 1.2rem;
+    padding-bottom: 1rem;
+    padding-top: 1rem;
+}
+
+
+/* ==============================================
+    สไตล์สำหรับหน้า Login
+==============================================
+*/
+.login-card {
+    background-color: var(--dark-blue);
+    width: 90%;
+    max-width: 1350px;
+    border-radius: 25px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    overflow: hidden; /* ป้องกันไม่ให้รูปทะลุขอบมน */
+    display: flex; 
+    margin-left: 3rem;
+}
+
+.login-card .row {
+    width: 100%;
+}
+
+.login-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* ทำให้รูปภาพเต็มพื้นที่โดยไม่เสียสัดส่วน */
+}
+
+.login-form-container {
+    padding: 4rem 9rem;
+}
+
+.dodash-title {
+    font-family: 'Jaro', sans-serif;
+    font-size: 5.5rem;
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+    color: var(--highlight-yellow);
+}
+
+.sign-in-title {
+    font-family: 'JejuHallasan', serif; 
+    font-weight: 500; 
+    color: #fff;
+    font-size: 2.5rem;
+    margin-bottom: 3rem;
+}
+
+.login-form-container,
+.login-form-container .form-control,
+.login-form-container .form-check-label,
+.login-form-container .create-account-text {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 400;
+}
+
+
+/* ==============================================
+    สไตล์สำหรับหน้า Register
+==============================================
+*/
+.page-wrapper-center {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.register-card {
+    background-color: var(--dark-blue);
+    width: 70%;
+    max-width: 1200px;
+    padding: 6rem 6rem;
+    border-radius: 25px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+
+.register-card .dodash-title {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    
+}
+
+.register-card .sign-in-title {
+    font-size: 2.5rem;
+    margin-bottom: 3.5rem;
+}
+
+.register-card .form-control,
+.register-card .form-check-label,
+.register-card .create-account-text,
+.register-card .btn {
+    font-family: 'Montserrat', sans-serif;
+}
+
+.register-card .form-check-input {
+    width: 1.25em;
+    height: 1.25em;
+    margin-top: 0.2em;
+}
+
+.register-card .form-check-input:checked {
+    background-color: var(--highlight-yellow);
+    border-color: var(--highlight-yellow);
+}
+
+.register-card .form-check-label {
+    padding-left: 0.5rem;
+}
+
+.register-card .form-check-label a {
+    text-decoration: none;
+}
+
+
+/* ==============================================
+    สไตล์ร่วม (Shared Styles)
+==============================================
+*/
+.btn-warning {
+    color: var(--dark-blue);
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 500;
+    background-color: var(--highlight-yellow); 
+    border-color: var(--highlight-yellow); 
+}
+
+.text-warning {
+    color: var(--highlight-yellow) !important;
+}
+
+.input-group-text {
+    background-color: #3a4a5e;
+    border-color: #3a4a5e;
+    color: #fff;
+}
+
+.form-control {
+    background-color: #fff;
+    border: 1px solid #ced4da;
+    padding: 0.75rem 1rem;
+}
+
+.form-control::placeholder {
+    color: #6c757d;
+}
+
+.form-check-label,
+.create-account-text {
+    color: rgba(255, 255, 255, 0.7);
+}
+

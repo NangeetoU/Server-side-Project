@@ -1,11 +1,9 @@
 /**
  * @file        usersController.js
  * @description Controller นี้จะรับผิดชอบทุกอย่างที่เกี่ยวข้องกับผู้ใช้ (Users)
- * ทั้งการแสดงหน้าเว็บ (Login, Register) และการจัดการข้อมูล (สร้าง, แก้ไข, ลบ)
  */
 
 const bcrypt = require('bcryptjs');
-// การเรียกใช้งาน Model ซึ่งจะทำหน้าที่เชื่อมต่อและจัดการข้อมูลในตาราง users
 const { UsersModel } = require('../models/usersModel');
 
 const UsersController = {
@@ -14,20 +12,46 @@ const UsersController = {
     // ส่วนที่ 1: ฟังก์ชันสำหรับ "แสดงผล" หน้าเว็บ (Render Views)
     // ==========================================================
 
-    /**
-     * @description    แสดงหน้า Login
-     * @route          GET /login
-     */
     getLoginPage(req, res) {
         res.render('login', { title: 'Login - DoDash' });
     },
 
-    /**
-     * @description    แสดงหน้า Register
-     * @route          GET /register
-     */
     getRegisterPage(req, res) {
         res.render('register', { title: 'Create Account - DoDash' });
+    },
+
+    /**
+     * @description    (ฟังก์ชันที่เพิ่มเข้ามาใหม่) แสดงหน้า Dashboard
+     * @route          GET /dashboard
+     * @purpose        หลังจาก Login สำเร็จ ฟังก์ชันนี้จะทำหน้าที่ render หน้า dashboard.ejs
+     */
+    
+    getDashboardPage(req, res) {
+        // --- (ส่วนที่แก้ไข) ---
+        // ในอนาคต ข้อมูลนี้จะมาจากฐานข้อมูลและ Session ของผู้ใช้ที่ Login อยู่
+        // แต่ตอนนี้ เราจะสร้าง "ข้อมูลจำลอง" (Mock Data) ขึ้นมาเพื่อให้หน้าเว็บแสดงผลได้ก่อน
+        const mockUser = {
+            first_name: 'Nangee',
+            last_name: 'ToU',
+            email: 'nangee@example.com'
+        };
+
+        const mockTasks = [
+            { title: 'Design Landing Page', description: 'Create a stunning design in Figma.' },
+            { title: 'Develop API Endpoints', description: 'Build all necessary routes for tasks.' }
+        ];
+
+        const mockCompletedTasks = [
+            { title: 'Setup Project Structure' }
+        ];
+
+        // ส่งข้อมูลทั้งหมดนี้ไปให้ไฟล์ dashboard.ejs
+        res.render('dashboard', { 
+            title: 'Dashboard - DoDash',
+            user: mockUser,
+            tasks: mockTasks,
+            completedTasks: mockCompletedTasks
+        });
     },
 
 
@@ -36,42 +60,55 @@ const UsersController = {
     // ============================================================
 
     /**
-     * @description    รับข้อมูลการเข้าสู่ระบบ
+     * @description    (แก้ไขใหม่) รับข้อมูลการเข้าสู่ระบบและตรวจสอบกับฐานข้อมูล
      * @route          POST /login
      */
     async handleLogin(req, res, next) {
         try {
             const { username, password } = req.body;
-            // --- ส่วนตรรกะสำหรับฐานข้อมูลจะถูกพัฒนาต่อที่นี่ ---
-            console.log('Login attempt with:', { username });
-            res.send(`Login successful for ${username}! (Dashboard page coming soon)`);
+
+            // 1. ค้นหาผู้ใช้ในฐานข้อมูลด้วย username ที่กรอกเข้ามา
+            // (เราต้องมั่นใจว่าในไฟล์ models/usersModel.js มีฟังก์ชัน findByUsername)
+            const user = await UsersModel.findByUsername(username);
+
+            // 2. ถ้าไม่พบผู้ใช้ในระบบ ให้ส่งข้อความแจ้งเตือน
+            // (เพื่อความปลอดภัย เราจะใช้ข้อความเดียวกันทั้งกรณี username ผิดและ password ผิด)
+            if (!user) {
+                return res.status(401).send('Invalid username or password');
+            }
+
+            // 3. เปรียบเทียบรหัสผ่านที่ผู้ใช้กรอก (password) กับรหัสผ่านที่ถูกเข้ารหัส (hash) ไว้ในฐานข้อมูล (user.password_hash)
+            const isMatch = await bcrypt.compare(password, user.password_hash);
+
+            // 4. ถ้ารหัสผ่านไม่ตรงกัน ให้ส่งข้อความแจ้งเตือน
+            if (!isMatch) {
+                return res.status(401).send('Invalid username or password');
+            }
+
+            // 5. ถ้าทุกอย่างถูกต้อง (Login สำเร็จ) ให้ redirect ไปหน้า Dashboard
+            // TODO: ในอนาคต เราจะสร้าง Session ของผู้ใช้ก่อนที่จะ redirect
+            
+            res.redirect('/dashboard');
+
         } catch (e) {
             console.error("Error during login:", e);
             next(e);
         }
     },
     
-    /**
-     * @description    รับข้อมูลการสมัครสมาชิกใหม่ (ฟังก์ชัน register เดิมที่นำมาปรับปรุง)
-     * @route          POST /register
-     */
     async handleRegister(req, res, next) {
         try {
             const { firstName, lastName, username, email, password, confirmPassword } = req.body;
 
-            // ตรวจสอบว่ากรอกข้อมูลครบถ้วนหรือไม่
             if (!firstName || !lastName || !username || !email || !password) {
                 return res.status(400).send('Missing required fields');
             }
-            // ตรวจสอบว่ารหัสผ่านที่กรอก 2 ครั้งตรงกันหรือไม่
             if (password !== confirmPassword) {
                 return res.status(400).send('Passwords do not match');
             }
 
-            // เข้ารหัสรหัสผ่าน (Hashing) เพื่อความปลอดภัย
             const password_hash = await bcrypt.hash(password, 10);
             
-            // สั่งให้ Model บันทึกข้อมูลผู้ใช้ใหม่ลงฐานข้อมูล
             await UsersModel.create({ 
                 first_name: firstName, 
                 last_name: lastName, 
@@ -80,7 +117,6 @@ const UsersController = {
                 password_hash 
             });
 
-            // หลังจากบันทึกสำเร็จ ให้ redirect (ส่ง) ผู้ใช้ไปที่หน้า Login
             res.redirect('/login');
 
         } catch (e) { 
@@ -93,11 +129,7 @@ const UsersController = {
     // ================================================================
     // ส่วนที่ 3: โค้ดเดิมของคุณ (สำหรับจัดการข้อมูลผ่าน API ในอนาคต)
     // ================================================================
-
-    /**
-     * @description    ดึงข้อมูลผู้ใช้ตาม ID
-     * @route          GET /users/:id
-     */
+    
     async getById(req, res, next) {
         try {
             const id = Number(req.params.id);
@@ -106,11 +138,7 @@ const UsersController = {
             res.json(user);
         } catch (e) { next(e); }
     },
-
-    /**
-     * @description    อัปเดตข้อมูลผู้ใช้ตาม ID
-     * @route          PUT /users/:id 
-     */
+ 
     async update(req, res, next) {
         try {
             const id = Number(req.params.id);
@@ -128,10 +156,6 @@ const UsersController = {
         } catch (e) {next(e);}
     },
 
-    /**
-     * @description    ลบผู้ใช้ตาม ID
-     * @route          DELETE /users/:id
-     */
     async remove(req, res, next) {
         try {
             const id = Number(req.params.id);
@@ -142,6 +166,5 @@ const UsersController = {
     } 
 };
 
-// ส่งออก Controller ทั้งหมดเพื่อให้ไฟล์ Route สามารถเรียกใช้งานได้
 module.exports = { UsersController };
 

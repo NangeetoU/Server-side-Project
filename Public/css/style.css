@@ -1,11 +1,10 @@
-/* ==============================================
-    ตัวแปรสี และการตั้งค่าพื้นฐาน (Global Settings)
-==============================================
-*/
 :root {
     --dark-blue: #293441;
     --main-bg: #5A7A9A;
-    --highlight-yellow: #FFD700; 
+    --highlight-yellow: #FFD700;
+    --status-green: #28a745;
+    --status-blue: #007bff;
+    --status-red: #dc3545;
 }
 
 html, body {
@@ -15,6 +14,7 @@ html, body {
     width: 100%;
     overflow-x: hidden;
 }
+
 
 body {
     background-color: var(--main-bg);
@@ -210,3 +210,346 @@ body {
     color: rgba(255, 255, 255, 0.7);
 }
 
+
+/* ================================================================
+    สไตล์สำหรับหน้า Dashboard V2 (ดีไซน์ใหม่ล่าสุด)
+================================================================
+*/
+
+/* 🎨 1. ทำให้เต็มจอ: กำหนดสไตล์เฉพาะ body ของหน้า Dashboard */
+body.dashboard-page {
+    align-items: flex-start;
+    justify-content: flex-start;
+    padding: 0;
+    background: var(--dark-blue);
+    background-image: none; /* ไม่ต้องมี background image */
+}
+
+.dashboard-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100vh;
+}
+
+/* 🎨 2. Navbar สี --main-bg */
+.dashboard-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem 2rem;
+    background-color: var(--main-bg); /* 👈 เปลี่ยนสี Navbar */
+    border-bottom: 1px solid #3a4a5e;
+    color: #fff;
+}
+
+.header-logo .dodash-title {
+    font-family: 'Jaro', sans-serif;
+    color: var(--highlight-yellow);
+}
+
+.header-search .search-form {
+    display: flex;
+    align-items: center;
+}
+
+.header-search input {
+    width: 350px;
+    padding: 0.5rem 1rem;
+    border-radius: 20px 0 0 20px;
+    border: 1px solid #3a4a5e;
+    background-color: var(--dark-blue);
+    color: #fff;
+}
+
+.header-search input:focus {
+    outline: none;
+    border-color: var(--highlight-yellow);
+}
+
+.header-search .search-btn {
+    padding: 0.5rem 1rem;
+    border-radius: 0 20px 20px 0;
+    border: 1px solid var(--highlight-yellow);
+    background-color: var(--highlight-yellow);
+    color: var(--dark-blue);
+    cursor: pointer;
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.header-actions .action-btn {
+    background: none;
+    border: none;
+    color: #a0a0a0;
+    font-size: 1.2rem;
+    cursor: pointer;
+}
+
+.header-actions .action-btn:hover {
+    color: #fff;
+}
+
+.date-display {
+    display: flex;
+    flex-direction: column;
+    text-align: right;
+    font-size: 0.8rem;
+}
+
+.date-display span:first-child {
+    font-weight: 500;
+}
+
+.dashboard-body {
+    display: flex;
+    flex-grow: 1;
+    overflow: hidden;
+}
+
+/* 🎨 4. Sidebar เต็มความสูง (ทำงานโดยอัตโนมัติจาก flex-grow) */
+.sidebar-v2 {
+    width: 280px;
+    background-color: #f0e6c8;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+}
+
+.user-profile-v2 {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.user-avatar-v2 {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    margin-bottom: 1rem;
+}
+
+.user-name-v2 {
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: var(--dark-blue);
+}
+
+.user-email-v2 {
+    font-size: 0.9rem;
+    color: #555;
+}
+
+.sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    flex-grow: 1;
+}
+
+.nav-link {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem 1rem;
+    border-radius: 10px;
+    color: #555;
+    text-decoration: none;
+    font-weight: 500;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+/* 🎨 3. ไอคอน nav เมื่อ hover เป็น highlight yellow */
+.nav-link:hover, .nav-link:hover i {
+    background-color: #e6dac1;
+    color: var(--highlight-yellow); /* 👈 เปลี่ยนสี Hover */
+}
+
+.nav-link.active {
+    background-color: #fff;
+    color: var(--dark-blue);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.nav-link i {
+    width: 20px;
+    transition: color 0.2s;
+}
+
+.logout-btn-v2 {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem 1rem;
+    color: #555;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.logout-btn-v2:hover {
+    color: var(--dark-blue);
+}
+
+.main-content-v2 {
+    flex-grow: 1;
+    padding: 2.5rem;
+    overflow-y: auto;
+}
+
+.welcome-title {
+    color: #fff;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 400;
+    font-size: 2rem;
+    margin-bottom: 2rem;
+}
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    grid-template-rows: auto auto;
+    gap: 2rem;
+}
+
+.info-card {
+    background-color: #fff;
+    border-radius: 15px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.info-card .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #eee;
+}
+
+.info-card h3 {
+    margin: 0;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--status-red);
+}
+
+/* 🎨 5. Add new task เป็น highlight yellow */
+.btn-add-task {
+    background-color: var(--highlight-yellow);
+    color: var(--dark-blue);
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.btn-add-task:hover {
+    background-color: #e6c300;
+}
+
+.to-do-card {
+    grid-column: 1 / 2;
+    grid-row: 1 / 3;
+}
+
+.task-status-card-v2 {
+    grid-column: 2 / 3;
+    grid-row: 1 / 2;
+}
+
+.status-circles {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    text-align: center;
+}
+
+/* 🎨 6. เปลี่ยนสี Label ของสถานะ */
+.circle-label {
+    margin-top: 0.5rem;
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+.circle-label.completed-label { color: var(--status-green); }
+.circle-label.in-progress-label { color: var(--status-blue); }
+.circle-label.not-started-label { color: var(--status-red); }
+
+/* CSS Progress Circle */
+.circle {
+    position: relative;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background-color: #dee2e6;
+    display: grid;
+    place-items: center;
+    margin: 5px auto;
+}
+
+.circle:before {
+    content: "";
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    background: conic-gradient(var(--c) calc(var(--p) * 3.6deg), #dee2e6 0deg);
+    border-radius: 50%;
+}
+
+.circle .inside-circle {
+    position: absolute;
+    width: 65px;
+    height: 65px;
+    background: #fff;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    font-size: 20px;
+    font-weight: bold;
+    color: var(--dark-blue);
+}
+
+.circle.completed:before { --c: var(--status-green); }
+.circle.in-progress:before { --c: var(--status-blue); }
+.circle.not-started:before { --c: var(--status-red); }
+
+
+.completed-task-card-v2 {
+    grid-column: 2 / 3;
+    grid-row: 2 / 3;
+}
+
+.completed-task-item-v2 {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background-color: #f8f9fa;
+    padding: 0.75rem;
+    border-radius: 8px;
+    margin-bottom: 0.75rem;
+}
+
+.completed-task-item-v2 i {
+    color: #28a745;
+}
+
+.empty-task {
+    border: 2px dashed #e0e0e0;
+    border-radius: 10px;
+    padding: 3rem;
+    text-align: center;
+    color: #aaa;
+}
+
+.empty-task.small {
+    padding: 1.5rem;
+    font-size: 0.9rem;
+}

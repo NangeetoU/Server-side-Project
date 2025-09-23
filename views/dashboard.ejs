@@ -1,0 +1,134 @@
+<!-- 1. เพิ่ม class="dashboard-page" เข้าไปใน header เพื่อให้ body รู้ว่าเป็นหน้า dashboard -->
+<%- include('partials/header', { bodyClass: 'dashboard-page' }) %>
+
+<div class="dashboard-container">
+
+    <header class="dashboard-header">
+        <div class="header-logo">
+            <h1 class="dodash-title" style="font-size: 2.5rem; margin: 0;">DoDash</h1>
+        </div>
+        <div class="header-search">
+            <form class="search-form">
+                <input type="text" placeholder="Search your task here...">
+                <button type="submit" class="search-btn"><i class="fas fa-search"></i></button>
+            </form>
+        </div>
+        <div class="header-actions">
+            <button class="action-btn"><i class="fas fa-filter"></i></button>
+            <button class="action-btn"><i class="fas fa-bell"></i></button>
+            <div class="date-display">
+                <span>Sunday</span>
+                <span>22/06/2025</span>
+            </div>
+        </div>
+    </header>
+
+    <div class="dashboard-body">
+
+        <aside class="sidebar-v2">
+            <div class="user-profile-v2">
+                <img src="/images/profile-placeholder.png" alt="User Avatar" class="user-avatar-v2">
+                <div class="user-info-v2">
+                    <span class="user-name-v2"><%= user ? `${user.first_name} ${user.last_name}` : 'Username' %></span>
+                    <span class="user-email-v2"><%= user ? user.email : 'user@example.com' %></span>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="/dashboard" class="nav-link active">
+                    <i class="fas fa-th-large"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="#" class="nav-link">
+                    <i class="fas fa-tasks"></i>
+                    <span>My Task</span>
+                </a>
+            </nav>
+            <a href="/logout" class="logout-btn-v2">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Logout</span>
+            </a>
+        </aside>
+
+        <main class="main-content-v2">
+            <h2 class="welcome-title">Welcome back, <%= user ? user.first_name : 'User' %> 👋</h2>
+
+            <div class="dashboard-grid">
+
+                <div class="info-card to-do-card">
+                    <div class="card-header">
+                        <h3>To-Do</h3>
+                        <button class="btn-add-task">+ Add Task</button>
+                    </div>
+                    <div class="card-body">
+                        <% if (tasks && tasks.length > 0) { %>
+                            <% tasks.forEach(task => { %>
+                                <div class="task-item">
+                                    <h4><%= task.title %></h4>
+                                    <p><%= task.description %></p>
+                                </div>
+                            <% }) %>
+                        <% } else { %>
+                            <div class="empty-task">
+                                Do you want to add a new Task?
+                            </div>
+                        <% } %>
+                    </div>
+                </div>
+
+                <div class="info-card task-status-card-v2">
+                    <div class="card-header">
+                        <h3>Task Status</h3>
+                    </div>
+                    <div class="card-body status-circles">
+                        <div class="circle-wrap">
+                            <div class="circle completed" style="--p:0;">
+                                <div class="inside-circle">0%</div>
+                            </div>
+                            <!-- 2. เพิ่ม class ให้ label -->
+                            <div class="circle-label completed-label">Completed</div>
+                        </div>
+                        <div class="circle-wrap">
+                            <div class="circle in-progress" style="--p:0;">
+                                 <div class="inside-circle">0%</div>
+                            </div>
+                             <!-- 2. เพิ่ม class ให้ label -->
+                            <div class="circle-label in-progress-label">In Progress</div>
+                        </div>
+                        <div class="circle-wrap">
+                             <div class="circle not-started" style="--p:0;">
+                                <div class="inside-circle">0%</div>
+                            </div>
+                             <!-- 2. เพิ่ม class ให้ label -->
+                            <div class="circle-label not-started-label">Not Started</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-card completed-task-card-v2">
+                     <div class="card-header">
+                        <h3>Completed Task</h3>
+                    </div>
+                     <div class="card-body">
+                         <% if (completedTasks && completedTasks.length > 0) { %>
+                            <% completedTasks.forEach(task => { %>
+                                <div class="completed-task-item-v2">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span><%= task.title %></span>
+                                </div>
+                            <% }) %>
+                        <% } else { %>
+                            <div class="empty-task small">
+                                No tasks completed recently.
+                            </div>
+                        <% } %>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+
+    </div>
+</div>
+
+<%- include('partials/footer') %>
+

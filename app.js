@@ -1,28 +1,36 @@
+// app.js
 const express = require('express');
 require('dotenv').config();
 
-// Import ส่วนต่างๆ ของโปรแกรม
+// --- Imports ---
 const { testConnection } = require('./config/database');
-const pageRoutes = require('./routes/pageRoutes');
+const pageRoutes  = require('./routes/pageRoutes');
 const usersRoutes = require('./routes/usersRoutes');
+const tasksRoutes = require('./routes/tasksRoutes');
 
-const app = express();
+const app  = express();
 const port = process.env.PORT || 3000;
 
-// ตั้งค่า Middleware
+// --- Middlewares ---
 app.set('view engine', 'ejs');
 app.use(express.static('public'));
 app.use(express.urlencoded({ extended: true }));
-app.use(express.json()); // Middleware สำหรับอ่าน JSON (ดีสำหรับ API ในอนาคต)
+app.use(express.json());
 
-// --- ส่วนที่แก้ไข ---
-// "Mount" หรือ "ประกาศใช้" ไฟล์ Routes ของเรา
-app.use('/', pageRoutes);  // จัดการเส้นทาง /
-app.use('/', usersRoutes); // บอกให้จัดการเส้นทาง /login, /register โดยไม่ต้องมี prefix
+// --- Mount API routes FIRST ---
+app.use('/users', usersRoutes);   // -> /users/register, /users/login, /users/...
+app.use('/tasks', tasksRoutes);   // -> /tasks/...
 
-// เริ่มทำงานเซิร์ฟเวอร์
+// --- Mount page routes LAST ---
+app.use('/', pageRoutes);         // -> หน้าเว็บปกติ เช่น '/', '/about', ฯลฯ
+
+// --- 404 fallback (สำหรับเส้นทางที่ไม่ match อะไรเลย) ---
+app.use((req, res) => {
+  res.status(404).json({ error: 'Not Found', path: req.originalUrl, method: req.method });
+});
+
+// --- Start server ---
 app.listen(port, () => {
-    console.log(`Server is running at http://localhost:${port}`);
-    // ทดสอบการเชื่อมต่อฐานข้อมูลเมื่อเซิร์ฟเวอร์เริ่มทำงาน
-    testConnection();
+  console.log(`Server is running at http://localhost:${port}`);
+  testConnection();
 });

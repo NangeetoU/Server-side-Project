@@ -291,7 +291,7 @@ body.dashboard-page {
 }
 
 .header-actions .action-btn:hover {
-    color: #fff;
+    color: var(--highlight-yellow);
 }
 
 .date-display {
@@ -365,10 +365,10 @@ body.dashboard-page {
     transition: background-color 0.2s, color 0.2s;
 }
 
-/* 🎨 3. ไอคอน nav เมื่อ hover เป็น highlight yellow */
+
 .nav-link:hover, .nav-link:hover i {
     background-color: #e6dac1;
-    color: var(--highlight-yellow); /* 👈 เปลี่ยนสี Hover */
+    color: var(--highlight-yellow); 
 }
 
 .nav-link.active {
@@ -552,4 +552,137 @@ body.dashboard-page {
 .empty-task.small {
     padding: 1.5rem;
     font-size: 0.9rem;
+}
+
+/* ==============================================
+    สไตล์สำหรับ Add Task Modal
+==============================================
+*/
+
+.modal-content {
+    background-color: #fff;
+    border-radius: 15px;
+    border: none;
+    box-shadow: 0 5px 25px rgba(0,0,0,0.15);
+}
+
+/* 🎨 1. (แก้ไข) จัด Layout ของ Modal Header ใหม่ */
+.modal-header {
+    display: flex;
+    justify-content: space-between; /* 👈 ทำให้ Title และ Go Back แยกกัน */
+    align-items: center;
+    border-bottom: 1px solid #f0f0f0;
+    padding: 1.5rem;
+}
+
+.modal-title {
+    font-weight: 600;
+    color: var(--dark-blue);
+}
+
+.go-back-link {
+    text-decoration: none;
+    color: #888;
+    font-weight: 500;
+}
+.go-back-link:hover {
+    color: var(--dark-blue);
+}
+
+.modal-body {
+    padding: 2rem;
+}
+
+.modal-body .form-label {
+    font-weight: 600;
+    color: var(--dark-blue);
+    margin-bottom: 0.5rem;
+}
+
+.modal-body .form-control {
+    border-radius: 8px;
+    border: 1px solid #ddd;
+}
+.modal-body .form-control:focus {
+    border-color: var(--highlight-yellow);
+    box-shadow: 0 0 0 0.25rem rgba(255, 215, 0, 0.25);
+}
+
+/* 🎨 2. (แก้ไข) Priority Radio Buttons ให้มีเครื่องหมายติ๊กถูก */
+.priority-options {
+    display: flex;
+    gap: 1.5rem;
+}
+.priority-option {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+}
+.priority-option input[type="radio"] {
+    display: none;
+}
+
+.priority-option .priority-box {
+    width: 20px;
+    height: 20px;
+    border-radius: 4px;
+    margin-right: 0.5rem;
+    position: relative; /* 👈 เพิ่ม position relative */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: background-color 0.2s; /* เพิ่ม animation สี */
+}
+/* สร้างเครื่องหมายติ๊กถูกที่ซ่อนไว้ */
+.priority-option .priority-box::after {
+    content: '✓';
+    font-size: 14px;
+    font-weight: bold;
+    color: #fff;
+    opacity: 0; /* 👈 ซ่อนไว้ก่อน */
+    transition: opacity 0.2s ease-in-out;
+}
+/* เมื่อถูกเลือก ให้แสดงเครื่องหมายติ๊กถูก */
+.priority-option input[type="radio"]:checked + .priority-box::after {
+    opacity: 1; /* 👈 แสดงเครื่องหมาย */
+}
+
+.priority-box.extreme { background-color: var(--status-red); }
+.priority-box.moderate { background-color: var(--status-blue); }
+.priority-box.low { background-color: var(--status-green); }
+
+/* Upload Area */
+.upload-area {
+    border: 2px dashed #ddd;
+    border-radius: 10px;
+    padding: 2rem;
+    text-align: center;
+    background-color: #f8f9fa;
+    color: #888;
+}
+.upload-area i {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+}
+.upload-area p {
+    margin-bottom: 1rem;
+}
+
+.modal-footer {
+    border-top: none;
+    padding: 0 2rem 2rem;
+}
+
+.btn-done {
+    background-color: var(--highlight-yellow);
+    color: var(--dark-blue);
+    border: none;
+    font-weight: bold;
+    padding: 0.75rem 2rem;
+    border-radius: 8px;
+    width: 100%;
+}
+.btn-done:hover {
+    background-color: #e6c300;
+    color: var(--dark-blue);
 }

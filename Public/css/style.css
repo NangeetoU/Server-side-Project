@@ -440,6 +440,34 @@ body.dashboard-page {
     color: var(--status-red);
 }
 
+.task-item {
+    background-color: #9ea2a557; /* สีเทาอ่อน */
+    padding: 1rem 1.25rem;
+    border-radius: 10px;
+    margin-bottom: 1rem; /* ระยะห่างระหว่าง task */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05); /* เพิ่มเงาเล็กน้อย */
+}
+
+/* ทำให้เป็น task สุดท้ายไม่มี margin-bottom */
+.task-item:last-child {
+    margin-bottom: 0;
+}
+
+.task-item h4 {
+    margin-top: 0;
+    margin-bottom: 0.25rem;
+    color: var(--dark-blue);
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.task-item p {
+    margin-bottom: 0;
+    font-size: 0.9rem;
+    color: #6c757d;
+    line-height: 1.5;
+}
+
 /* 🎨 5. Add new task เป็น highlight yellow */
 .btn-add-task {
     background-color: var(--highlight-yellow);
@@ -608,6 +636,113 @@ body.dashboard-page {
     box-shadow: 0 0 0 0.25rem rgba(255, 215, 0, 0.25);
 }
 
+/* ==============================================
+    (เพิ่มใหม่) สไตล์สำหรับ Task Item ที่มีฟังก์ชัน
+==============================================
+*/
+
+.task-item {
+    display: flex; /* 👈 ทำให้เนื้อหาและปุ่มอยู่คนละฝั่ง */
+    justify-content: space-between;
+    align-items: center;
+    background-color: #f8f9fa; /* สีเทาอ่อน */
+    padding: 1rem 1.25rem;
+    border-radius: 10px;
+    margin-bottom: 1rem; /* ระยะห่างระหว่าง task */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05); /* เพิ่มเงาเล็กน้อย */
+}
+
+/* ทำให้เป็น task สุดท้ายไม่มี margin-bottom */
+.task-item:last-child {
+    margin-bottom: 0;
+}
+
+.task-content {
+    display: flex; /* 👈 ทำให้วงกลมและข้อความอยู่ข้างกัน */
+    align-items: center;
+    gap: 1rem;
+}
+
+.task-details h4 {
+    margin-top: 0;
+    margin-bottom: 0.25rem;
+    color: var(--dark-blue);
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.task-details p {
+    margin-bottom: 0;
+    font-size: 0.9rem;
+    color: #6c757d;
+    line-height: 1.5;
+}
+
+/* วงกลม Priority */
+.priority-indicator {
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    flex-shrink: 0; /* ป้องกันไม่ให้วงกลมหด */
+}
+
+.priority-indicator.extreme { 
+    background-color: var(--status-red); 
+}
+.priority-indicator.moderate { 
+    background-color: var(--status-blue); 
+}
+.priority-indicator.low { 
+    background-color: var(--status-green); 
+}
+
+
+.task-actions .task-options-btn {
+    background: none;
+    border: none;
+    color: #a0a0a0;
+    padding: 0.5rem;
+    border-radius: 50%;
+    width: 35px;
+    height: 35px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: background-color 0.2s;
+}
+
+.task-actions .task-options-btn:hover {
+    background-color: #e9ecef;
+    color: var(--dark-blue);
+}
+
+/* 1. พื้นหลังของ Dropdown เป็น --main-bg */
+.task-actions .dropdown-menu {
+    background-color: var(--main-bg);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+
+/* เปลี่ยนสีตัวอักษรข้างในให้เป็นสีขาว */
+.task-actions .dropdown-item {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.9rem;
+    color: #fff;
+}
+
+/* 3. เมื่อ Hover ให้เป็นสีเหลืองอ่อน */
+.task-actions .dropdown-item:hover {
+    background-color: var(--highlight-yellow-light);
+    color: var(--dark-blue);
+}
+
+/* 2. เมื่อ Active/Selected ให้เป็นสีเหลืองหลัก */
+.task-actions .dropdown-item:active,
+.task-actions .dropdown-item.active {
+    background-color: var(--highlight-yellow);
+    color: var(--dark-blue);
+}
+
 /* 🎨 2. (แก้ไข) Priority Radio Buttons ให้มีเครื่องหมายติ๊กถูก */
 .priority-options {
     display: flex;
@@ -651,22 +786,6 @@ body.dashboard-page {
 .priority-box.moderate { background-color: var(--status-blue); }
 .priority-box.low { background-color: var(--status-green); }
 
-/* Upload Area */
-.upload-area {
-    border: 2px dashed #ddd;
-    border-radius: 10px;
-    padding: 2rem;
-    text-align: center;
-    background-color: #f8f9fa;
-    color: #888;
-}
-.upload-area i {
-    font-size: 2.5rem;
-    margin-bottom: 1rem;
-}
-.upload-area p {
-    margin-bottom: 1rem;
-}
 
 .modal-footer {
     border-top: none;
@@ -685,4 +804,104 @@ body.dashboard-page {
 .btn-done:hover {
     background-color: #e6c300;
     color: var(--dark-blue);
+}
+
+/* ==============================================
+    (เพิ่มใหม่) สไตล์สำหรับหน้า Task Detail
+==============================================
+*/
+
+/* ทำให้ Task Card ที่เป็นลิงก์ไม่มีขีดเส้นใต้ และมี animation */
+.task-item-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+}
+.task-item-link .task-item {
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+.task-item-link:hover .task-item {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+}
+
+/* Breadcrumb Navigation */
+.breadcrumb {
+    background-color: transparent;
+    padding: 0;
+}
+.breadcrumb-item a {
+    text-decoration: none;
+    color: var(--highlight-yellow);
+}
+.breadcrumb-item.active {
+    color: #fff;
+}
+
+/* Task Detail Card */
+.task-detail-card {
+    background-color: #fff;
+    border-radius: 15px;
+    padding: 2.5rem;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+.task-detail-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+.task-detail-title-group {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+.task-detail-title-group h2 {
+    margin: 0;
+    font-size: 2rem;
+    font-weight: 600;
+    color: var(--dark-blue);
+}
+.task-detail-date {
+    font-weight: 500;
+    color: #888;
+}
+.task-detail-body p {
+    font-size: 1.1rem;
+    line-height: 1.7;
+    color: #555;
+    white-space: pre-wrap; /* ทำให้ \n ขึ้นบรรทัดใหม่ */
+}
+.task-detail-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+.btn-edit, .btn-delete {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.btn-edit {
+    background-color: var(--status-blue);
+    color: #fff;
+}
+.btn-edit:hover {
+    background-color: #0056b3;
+}
+.btn-delete {
+    background-color: var(--status-red);
+    color: #fff;
+}
+.btn-delete:hover {
+    background-color: #c82333;
 }

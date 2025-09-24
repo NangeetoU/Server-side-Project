@@ -63,11 +63,35 @@
                     <div class="card-body">
                         <% if (tasks && tasks.length > 0) { %>
                             <% tasks.forEach(task => { %>
-                                <div class="task-item">
-                                    <h4><%= task.title %></h4>
-                                    <p><%= task.description %></p>
+                            <a href="/task/<%= task.task_id %>" class="task-item-link">
+                                <div class="task-item" id="task-item-<%= task.task_id %>">
+                                    <div class="task-content">
+                                        <% 
+                                            let priorityClass = 'low';
+                                            if (task.priority === 2) priorityClass = 'moderate';
+                                            if (task.priority === 3) priorityClass = 'extreme';
+                                        %>
+                                        <span class="priority-indicator <%= priorityClass %>"></span>
+                                        <div class="task-details">
+                                            <h4><%= task.title %></h4>
+                                            <p><%= task.description %></p>
+                                        </div>
+                                    </div>
+                                    <div class="task-actions">
+                                        <div class="dropdown">
+                                            <button class="task-options-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                <i class="fas fa-ellipsis-v"></i>
+                                            </button>
+                                            <ul class="dropdown-menu dropdown-menu-end">
+                                                <li><a class="dropdown-item" href="#">Completed</a></li>
+                                                <li><a class="dropdown-item" href="#">In progress</a></li>
+                                                <li><a class="dropdown-item" href="#">Not started</a></li>
+                                            </ul>
+                                        </div>
+                                    </div>
                                 </div>
-                            <% }) %>
+                            </a>
+                        <% }) %>
                         <% } else { %>
                             <div class="empty-task">
                                 Do you want to add a new Task?
@@ -139,7 +163,7 @@
             <div class="modal-body">
                 <form id="addTaskForm" action="/tasks" method="POST">
                     <div class="row">
-                        <div class="col-md-7">
+                        <div class="col-md-12"> 
                             <div class="mb-3">
                                 <label for="taskTitle" class="form-label">Title</label>
                                 <input type="text" class="form-control" id="taskTitle" name="title" required>
@@ -170,18 +194,7 @@
                                 <textarea class="form-control" id="taskDescription" name="description" rows="4"></textarea>
                             </div>
                         </div>
-                        <div class="col-md-5">
-                             <div class="mb-3">
-                                <label for="taskImage" class="form-label">Upload Image</label>
-                                <div class="upload-area">
-                                    <i class="fas fa-cloud-upload-alt"></i>
-                                    <p>Drag&Drop files here or</p>
-                                    <button type="button" class="btn btn-secondary btn-sm">Browse</button>
-                                    <input type="file" id="taskImage" name="image" hidden>
-                                </div>
-                            </div>
                         </div>
-                    </div>
                 </form>
             </div>
             <div class="modal-footer">

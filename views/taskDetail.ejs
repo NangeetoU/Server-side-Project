@@ -1,0 +1,96 @@
+<%- include('partials/header', { bodyClass: 'dashboard-page' }) %>
+
+<div class="dashboard-container">
+    <%- include('partials/dashboard-header') %>
+    <div class="dashboard-body">
+        <%- include('partials/dashboard-sidebar') %>
+
+        <main class="main-content-v2">
+            <nav aria-label="breadcrumb" class="mb-4">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/dashboard">Dashboard</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Task Details</li>
+                </ol>
+            </nav>
+
+            <div class="task-detail-card">
+                <div class="task-detail-header">
+                    <div class="task-detail-title-group">
+                        <% 
+                            let priorityClass = 'low';
+                            if (task.priority === 2) priorityClass = 'moderate';
+                            if (task.priority === 3) priorityClass = 'extreme';
+                        %>
+                        <span class="priority-indicator <%= priorityClass %>"></span>
+                        <h2><%= task.title %></h2>
+                    </div>
+                    <span class="task-detail-date">Due Date: <%= task.due_date %></span>
+                </div>
+                <div class="task-detail-body">
+                    <p><%= task.description %></p>
+                </div>
+                <div class="task-detail-footer">
+                    <button class="btn btn-edit" data-bs-toggle="modal" data-bs-target="#editTaskModal">
+                        <i class="fas fa-edit"></i> Edit Task
+                    </button>
+                    <button class="btn btn-delete">
+                        <i class="fas fa-trash"></i> Delete Task
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<div class="modal fade" id="editTaskModal" tabindex="-1" aria-labelledby="editTaskModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editTaskModalLabel">Edit Task</h5>
+                <a href="#" class="go-back-link" data-bs-dismiss="modal">Go Back</a>
+            </div>
+            <div class="modal-body">
+                <form id="editTaskForm" action="/task/<%= task.task_id %>?_method=PUT" method="POST">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="mb-3">
+                                <label for="editTaskTitle" class="form-label">Title</label>
+                                <input type="text" class="form-control" id="editTaskTitle" name="title" value="<%= task.title %>" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editTaskDate" class="form-label">Date</label>
+                                <input type="date" class="form-control" id="editTaskDate" name="due_date" value="<%= task.due_date %>">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Priority</label>
+                                <div class="priority-options">
+                                    <label class="priority-option">
+                                        <input type="radio" name="priority" value="3" <%= task.priority === 3 ? 'checked' : '' %>>
+                                        <span class="priority-box extreme"></span> Extreme
+                                    </label>
+                                    <label class="priority-option">
+                                        <input type="radio" name="priority" value="2" <%= task.priority === 2 ? 'checked' : '' %>>
+                                        <span class="priority-box moderate"></span> Moderate
+                                    </label>
+                                    <label class="priority-option">
+                                        <input type="radio" name="priority" value="1" <%= task.priority === 1 ? 'checked' : '' %>>
+                                        <span class="priority-box low"></span> Low
+                                    </label>
+                                </div>
+                            </div>
+                             <div class="mb-3">
+                                <label for="editTaskDescription" class="form-label">Task Description</label>
+                                <textarea class="form-control" id="editTaskDescription" name="description" rows="4"><%= task.description %></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" form="editTaskForm" class="btn btn-done">Save Changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('partials/footer') %>

@@ -54,8 +54,9 @@ const UsersModel = {
       { user_id }
     );
     return res.affectedRows > 0;
-  }
+  },
 
 };
 
 module.exports = { UsersModel };
+

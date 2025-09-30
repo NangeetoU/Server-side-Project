@@ -1,75 +1,177 @@
+// models/tasksModel.js
 const { pool } = require('../config/database');
 
-//Status and Priority
+// Status and Priority
 const ALLOWED_STATUS = ['NOT_STARTED', 'IN_PROGRESS', 'COMPLETED'];
 const ALLOWED_PRIORITY = ['LOW', 'MODERATE', 'EXTREME'];
 
+// คอลัมน์ที่อนุญาตให้ ORDER BY (กัน SQL injection)
+const ORDERABLE = new Set(['created_at', 'due_at', 'priority', 'title', 'status', 'task_id']);
+
 const TasksModel = {
 
-    //Create
-    async create({user_id, title, description = null, image_url = null, status = 'NOT_STARTED', priority = 'LOW', due_at = null}) {
-        const [res] = await pool.execute(
-            `INSERT INTO tasks (user_id, title, description, image_url, status, priority, due_at)
-            VALUES (:user_id, :title, :description, :image_url, :status, :priority, :due_at)`,
-        { user_id, title, description, image_url, status, priority, due_at });
-        return res.insertId;
-    },
+  //Create
+  async create({ user_id, title, description = null, image_url = null, status = 'NOT_STARTED', priority = 'LOW', due_at = null }) {
+    const [res] = await pool.execute(
+      `INSERT INTO tasks (user_id, title, description, image_url, status, priority, due_at)
+       VALUES (:user_id, :title, :description, :image_url, :status, :priority, :due_at)`,
+      { user_id, title, description, image_url, status, priority, due_at }
+    );
+    return res.insertId;
+  },
 
-    // READ by id 
-    async findById(task_id, user_id) {
+  // READ by id 
+  async findById(task_id, user_id) {
     const [rows] = await pool.execute(
-      `SELECT task_id, user_id, title, description, image_url, status, priority, due_at
-        FROM tasks
+      `SELECT task_id, user_id, title, description, image_url, status, priority, due_at, created_at
+         FROM tasks
         WHERE task_id = :task_id AND user_id = :user_id`,
       { task_id, user_id }
     );
     return rows[0] || null;
-    },
+  },
 
-   //Update
-   async update(task_id, user_id, { title, description, image_url, status, priority, due_at }) {
+  //Update
+  async update(task_id, user_id, { title, description, image_url, status, priority, due_at }) {
     if (status && !ALLOWED_STATUS.includes(status)) throw new Error('INVALID_STATUS');
     if (priority && !ALLOWED_PRIORITY.includes(priority)) throw new Error('INVALID_PRIORITY');
-    
-    
+
     const [res] = await pool.execute(
-        `UPDATE tasks
-            SET title   = COALESCE(:title, title),
-            description = COALESCE(:description, description),
-            image_url   = COALESCE(:image_url, image_url),
-            status      = COALESCE(:status, status),
-            priority    = COALESCE(:priority, priority),
-            due_at      = COALESCE(:due_at, due_at)
+      `UPDATE tasks
+          SET title       = COALESCE(:title, title),
+              description = COALESCE(:description, description),
+              image_url   = COALESCE(:image_url, image_url),
+              status      = COALESCE(:status, status),
+              priority    = COALESCE(:priority, priority),
+              due_at      = COALESCE(:due_at, due_at)
         WHERE task_id = :task_id AND user_id = :user_id`,
-    { task_id, user_id, title, description, image_url, status, priority, due_at });
+      { task_id, user_id, title, description, image_url, status, priority, due_at }
+    );
     return res.affectedRows > 0;
-    },
+  },
 
-    //DELETE
-    async remove(task_id, user_id) {
+  //DELETE
+  async remove(task_id, user_id) {
     const [res] = await pool.execute(
-        `DELETE FROM tasks WHERE task_id = :task_id AND user_id = :user_id`,
-    { task_id, user_id });
+      `DELETE FROM tasks WHERE task_id = :task_id AND user_id = :user_id`,
+      { task_id, user_id }
+    );
     return res.affectedRows > 0;
-    },
+  },
 
-
-    // PATCH status (PATCH /tasks/:id/status)
-    async patchStatus(task_id, user_id, status) {
+  // PATCH status (PATCH /tasks/:id/status)
+  async patchStatus(task_id, user_id, status) {
     if (!ALLOWED_STATUS.includes(status)) return false;
     const [res] = await pool.execute(
-        `UPDATE tasks SET status = :status
+      `UPDATE tasks SET status = :status
         WHERE task_id = :task_id AND user_id = :user_id`,
-    { status, task_id, user_id });
+      { status, task_id, user_id }
+    );
     return res.affectedRows > 0;
-    }
+  },
 
-    //FILLER NOT_STARTED, IN_PROGRESS หน้าหลัก
-    //FILLER NOT_STARTED หน้ากรอง1
-    //FILLER IN_PROGRESS หน้ากรอง2
-    //FILLER COMPLETED หน้ากรอง3
+  // ===== FILLERS =====
+  // NOT_STARTED
+  async fillernotstarted(user_id, { page = 1, pageSize = 10, orderBy = 'created_at', orderDir = 'DESC' } = {}) {
+    const col = ORDERABLE.has(orderBy) ? orderBy : 'created_at';
+    const dir = String(orderDir).toUpperCase() === 'ASC' ? 'ASC' : 'DESC';
+    const limit  = Math.max(1, Math.trunc(Number(pageSize)));
+    const offset = Math.max(0, Math.trunc((Number(page) - 1) * limit));
 
-    //SEARCH By title
-}
+    // ใช้ positional placeholders กับ LIMIT/OFFSET
+    const [rows] = await pool.query(
+      `SELECT task_id, user_id, title, description, image_url, status, priority, due_at, created_at
+         FROM tasks
+        WHERE user_id = ? AND status = 'NOT_STARTED'
+        ORDER BY ${col} ${dir}
+        LIMIT ? OFFSET ?`,
+      [user_id, limit, offset]
+    );
+
+    const [[{ total }]] = await pool.query(
+      `SELECT COUNT(*) AS total FROM tasks WHERE user_id = ? AND status = 'NOT_STARTED'`,
+      [user_id]
+    );
+
+    return { page: Number(page), pageSize: limit, total: Number(total), data: rows || [] };
+  },
+
+  // IN_PROGRESS
+  async fillerinprogress(user_id, { page = 1, pageSize = 10, orderBy = 'created_at', orderDir = 'DESC' } = {}) {
+    const col = ORDERABLE.has(orderBy) ? orderBy : 'created_at';
+    const dir = String(orderDir).toUpperCase() === 'ASC' ? 'ASC' : 'DESC';
+    const limit  = Math.max(1, Math.trunc(Number(pageSize)));
+    const offset = Math.max(0, Math.trunc((Number(page) - 1) * limit));
+
+    const [rows] = await pool.query(
+      `SELECT task_id, user_id, title, description, image_url, status, priority, due_at, created_at
+         FROM tasks
+        WHERE user_id = ? AND status = 'IN_PROGRESS'
+        ORDER BY ${col} ${dir}
+        LIMIT ? OFFSET ?`,
+      [user_id, limit, offset]
+    );
+
+    const [[{ total }]] = await pool.query(
+      `SELECT COUNT(*) AS total FROM tasks WHERE user_id = ? AND status = 'IN_PROGRESS'`,
+      [user_id]
+    );
+
+    return { page: Number(page), pageSize: limit, total: Number(total), data: rows || [] };
+  },
+
+  // COMPLETED
+  async fillercompleted(user_id, { page = 1, pageSize = 10, orderBy = 'created_at', orderDir = 'DESC' } = {}) {
+    const col = ORDERABLE.has(orderBy) ? orderBy : 'created_at';
+    const dir = String(orderDir).toUpperCase() === 'ASC' ? 'ASC' : 'DESC';
+    const limit  = Math.max(1, Math.trunc(Number(pageSize)));
+    const offset = Math.max(0, Math.trunc((Number(page) - 1) * limit));
+
+    const [rows] = await pool.query(
+      `SELECT task_id, user_id, title, description, image_url, status, priority, due_at, created_at
+         FROM tasks
+        WHERE user_id = ? AND status = 'COMPLETED'
+        ORDER BY ${col} ${dir}
+        LIMIT ? OFFSET ?`,
+      [user_id, limit, offset]
+    );
+
+    const [[{ total }]] = await pool.query(
+      `SELECT COUNT(*) AS total FROM tasks WHERE user_id = ? AND status = 'COMPLETED'`,
+      [user_id]
+    );
+
+    return { page: Number(page), pageSize: limit, total: Number(total), data: rows || [] };
+  },
+
+  // SEARCH By title
+  async searchByTitle(user_id, queryText) {
+    if (!queryText || !queryText.trim()) return [];
+    const like = `%${queryText}%`;
+    const [rows] = await pool.execute(
+      `SELECT task_id, user_id, title, description, image_url, status, priority, due_at, created_at
+         FROM tasks
+        WHERE user_id = :user_id
+          AND title LIKE :like
+        ORDER BY task_id`,
+      { user_id, like }
+    );
+    return rows || [];
+  },
+
+  // CountByStatus
+  async countByStatus(user_id) {
+    const [rows] = await pool.execute(
+      `SELECT status, COUNT(*) AS total
+         FROM tasks
+        WHERE user_id = :user_id
+        GROUP BY status`,
+      { user_id }
+    );
+    const out = { NOT_STARTED: 0, IN_PROGRESS: 0, COMPLETED: 0 };
+    for (const r of rows) if (out[r.status] !== undefined) out[r.status] = Number(r.total);
+    return out;
+  }
+};
 
 module.exports = { TasksModel };

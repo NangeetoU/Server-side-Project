@@ -1,3 +1,182 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+    // ==========================================================
+    // ส่วนที่ 1: โค้ดสำหรับ Profile Modal
+    // ==========================================================
+    const profileForm = document.getElementById('profileForm');
+    if (profileForm) {
+        profileForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const formData = new FormData(profileForm);
+            const data = Object.fromEntries(formData.entries());
+
+            if (!data.password) {
+                delete data.password;
+                delete data.confirmPassword;
+            }
+
+            try {
+                const response = await fetch('/users/me', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                if (!response.ok) {
+                    const errorResult = await response.json();
+                    throw new Error(errorResult.error || 'Failed to update profile.');
+                }
+                const updatedUser = await response.json();
+
+                document.querySelector('.user-name-v2').textContent = `${updatedUser.first_name} ${updatedUser.last_name}`;
+                document.querySelector('.user-email-v2').textContent = updatedUser.email;
+                document.querySelector('.welcome-title').textContent = `Welcome back, ${updatedUser.first_name} 👋`;
+
+                const profileModal = bootstrap.Modal.getInstance(document.getElementById('profileModal'));
+                profileModal.hide();
+                alert('Profile updated successfully!');
+            } catch (error) {
+                console.error('Error updating profile:', error);
+                alert(`Error: ${error.message}`);
+            }
+        });
+    }
+
+    // ==========================================================
+    // ส่วนที่ 2: โค้ดสำหรับจัดการ Task Status
+    // ==========================================================
+    const mainContent = document.querySelector('.main-content-v2');
+    if (mainContent) {
+        mainContent.addEventListener('click', async (event) => {
+            const target = event.target.closest('.dropdown-item[data-task-id]');
+            if (!target) return;
+
+            event.preventDefault();
+            const taskId = target.dataset.taskId;
+            const newStatus = target.dataset.status;
+
+            try {
+                const response = await fetch(`/tasks/${taskId}/status`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status: newStatus })
+                });
+                if (!response.ok) {
+                    const errorResult = await response.json();
+                    throw new Error(errorResult.error || 'Failed to update task status.');
+                }
+                alert('Task status updated!');
+                location.reload();
+            } catch (error) {
+                console.error('Error updating task status:', error);
+                alert(`Error: ${error.message}`);
+            }
+        });
+    }
+
+    // ==========================================================
+    // ส่วนที่ 3: โค้ดสำหรับ Add Task Form
+    // ==========================================================
+    const addTaskForm = document.getElementById('addTaskForm');
+    if (addTaskForm) {
+        addTaskForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const formData = new FormData(addTaskForm);
+            const data = Object.fromEntries(formData.entries());
+
+            try {
+                const response = await fetch('/tasks', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                if (!response.ok) {
+                    const errorResult = await response.json();
+                    throw new Error(errorResult.error || 'Failed to create task.');
+                }
+                const newTask = await response.json();
+                const taskElement = createTaskElement(newTask);
+                
+                const todoList = document.querySelector('.to-do-card .card-body');
+                const emptyTaskEl = todoList.querySelector('.empty-task');
+                if (emptyTaskEl) emptyTaskEl.remove();
+                
+                todoList.prepend(taskElement);
+
+                if (window.FontAwesome) {
+                    FontAwesome.dom.i2svg();
+                }
+
+                const addTaskModal = bootstrap.Modal.getInstance(document.getElementById('addTaskModal'));
+                addTaskModal.hide();
+                addTaskForm.reset();
+            } catch (error) {
+                console.error('Error creating task:', error);
+                alert(`Error: ${error.message}`);
+            }
+        });
+    }
+
+    /**
+     * ฟังก์ชันผู้ช่วยสำหรับสร้าง HTML element ของ Task
+     */
+    function createTaskElement(task) {
+    const div = document.createElement('div');
+    div.className = 'task-item';
+    div.id = `task-item-${task.task_id}`;
+
+    // --- Logic สำหรับ Status, Priority, และ Date ---
+    let statusText = 'Not Started';
+    let statusClass = 'not-started';
+    if (task.status === 'IN_PROGRESS') {
+        statusText = 'In Progress';
+        statusClass = 'in-progress';
+    } else if (task.status === 'COMPLETED') {
+        statusText = 'Completed';
+        statusClass = 'completed';
+    }
+
+    let priorityClass = 'low';
+    if (task.priority === 'MODERATE') priorityClass = 'moderate';
+    if (task.priority === 'EXTREME') priorityClass = 'extreme';
+
+    let dueDateHtml = '';
+    if (task.due_at) {
+        const formattedDate = new Date(task.due_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        dueDateHtml = `<div class="task-due-date"><i class="fas fa-calendar-alt"></i><span>${formattedDate}</span></div>`;
+    }
+
+    div.innerHTML = `
+        <a href="/task/${task.task_id}" class="task-item-link">
+            <div class="task-content">
+                <span class="priority-indicator ${priorityClass}"></span>
+                <div class="task-details">
+                    <h4>${task.title}</h4>
+                    <p>${task.description || ''}</p>
+                </div>
+            </div>
+        </a>
+        <div class="d-flex align-items-center">
+            ${dueDateHtml}
+            <span class="status-badge status-${statusClass}">${statusText}</span>
+            <div class="task-actions">
+                <div class="dropdown">
+                    <button class="task-options-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-ellipsis-v"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="#" data-task-id="${task.task_id}" data-status="COMPLETED">Completed</a></li>
+                        <li><a class="dropdown-item" href="#" data-task-id="${task.task_id}" data-status="IN_PROGRESS">In Progress</a></li>
+                        <li><a class="dropdown-item" href="#" data-task-id="${task.task_id}" data-status="NOT_STARTED">Not Started</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    `;
+
+    return div;
+    }
+});
+</script>

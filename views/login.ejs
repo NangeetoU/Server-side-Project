@@ -8,7 +8,9 @@
                 <div class="login-form-container">
                     <h1 class="dodash-title">DoDash</h1>
                     <h2 class="sign-in-title">Sign in</h2>
-
+                    <div class="alert alert-success d-none" id="register-success-alert" role="alert">
+    ✅ Registration successful! Please sign in.
+</div>
                     <form action="/login" method="POST">
                         <div class="input-group mb-3">
                             <span class="input-group-text"><i class="fas fa-user"></i></span>
@@ -26,6 +28,11 @@
                                 </label>
                             </div>
                         </div>
+                        <% if (typeof error !== 'undefined' && error) { %>
+                <div class="alert alert-danger mt-3" role="alert">
+                    <%= error %>
+                </div>
+            <% } %>
                         <button type="submit" class="btn btn-warning w-100 fw-bold">Login</button>
                     </form>
                     
@@ -42,6 +49,22 @@
         </div>
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // สร้าง object เพื่ออ่านค่าจาก Query Parameter ใน URL
+        const params = new URLSearchParams(window.location.search);
+
+        // เช็คว่ามี parameter ที่ชื่อ 'registered' และมีค่าเป็น 'success' หรือไม่
+        if (params.get('registered') === 'success') {
+            // ถ้าใช่, ให้หา Alert ของเราแล้วเอา class 'd-none' ออกเพื่อให้มันแสดงผล
+            const successAlert = document.getElementById('register-success-alert');
+            if (successAlert) {
+                successAlert.classList.remove('d-none');
+            }
+        }
+    });
+</script>
 
 <%- include('partials/footer') %>
 

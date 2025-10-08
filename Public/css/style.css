@@ -367,7 +367,7 @@ body.dashboard-page {
 
 
 .nav-link:hover, .nav-link:hover i {
-    background-color: #e6dac1;
+    background-color: #212549;
     color: var(--highlight-yellow); 
 }
 
@@ -499,6 +499,41 @@ body.dashboard-page {
     justify-content: space-around;
     align-items: center;
     text-align: center;
+}
+
+/* (เพิ่มใหม่) สไตล์สำหรับป้ายบอกสถานะ (Status Badge) */
+.status-badge {
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    margin-right: 1rem; /* เพิ่มระยะห่างจากปุ่มจุดไข่ปลา */
+}
+
+/* สีสำหรับแต่ละสถานะ */
+.status-badge.status-not-started {
+    background-color: var(--status-red);
+    color: white;
+}
+
+.status-badge.status-in-progress {
+    background-color: var(--status-blue); 
+    color: white;
+}
+
+.status-badge.status-completed {
+    background-color: var(--status-green); 
+    color: white;
+}
+
+.task-due-date {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.8rem;
+    color: #6c757d;
+    margin-right: 1rem;
 }
 
 /* 🎨 6. เปลี่ยนสี Label ของสถานะ */
@@ -905,3 +940,19 @@ body.dashboard-page {
 .btn-delete:hover {
     background-color: #c82333;
 }
+
+.alert {
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+

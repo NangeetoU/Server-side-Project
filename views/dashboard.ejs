@@ -1,208 +1,355 @@
 <%- include('partials/header', { bodyClass: 'dashboard-page' }) %>
 
-<div class="dashboard-container">
+    <div class="dashboard-container">
 
-    <header class="dashboard-header">
-        <div class="header-logo">
-            <h1 class="dodash-title" style="font-size: 2.5rem; margin: 0;">DoDash</h1>
-        </div>
-        <div class="header-search">
-            <form class="search-form">
-                <input type="text" placeholder="Search your task here...">
-                <button type="submit" class="search-btn"><i class="fas fa-search"></i></button>
-            </form>
-        </div>
-        <div class="header-actions">
-            <button class="action-btn"><i class="fas fa-filter"></i></button>
-            <button class="action-btn"><i class="fas fa-bell"></i></button>
-            <div class="date-display">
-                <span>Wednesday</span>
-                <span>24/09/2025</span>
+        <header class="dashboard-header">
+            <div class="header-logo">
+                <h1 class="dodash-title" style="font-size: 2.5rem; margin: 0;">DoDash</h1>
             </div>
-        </div>
-    </header>
-
-    <div class="dashboard-body">
-
-        <aside class="sidebar-v2">
-            <div class="user-profile-v2">
-                <img src="/images/profile-placeholder.png" alt="User Avatar" class="user-avatar-v2">
-                <div class="user-info-v2">
-                    <span class="user-name-v2"><%= user ? `${user.first_name} ${user.last_name}` : 'Username' %></span>
-                    <span class="user-email-v2"><%= user ? user.email : 'user@example.com' %></span>
-                </div>
-            </div>
-            <nav class="sidebar-nav">
-                <a href="/dashboard" class="nav-link active">
-                    <i class="fas fa-th-large"></i>
-                    <span>Dashboard</span>
-                </a>
-                <a href="#" class="nav-link">
-                    <i class="fas fa-tasks"></i>
-                    <span>My Task</span>
-                </a>
-            </nav>
-            <a href="/logout" class="logout-btn-v2">
-                <i class="fas fa-sign-out-alt"></i>
-                <span>Logout</span>
-            </a>
-        </aside>
-
-        <main class="main-content-v2">
-            <h2 class="welcome-title">Welcome back, <%= user ? user.first_name : 'User' %> 👋</h2>
-
-            <div class="dashboard-grid">
-
-                <div class="info-card to-do-card">
-                    <div class="card-header">
-                        <h3>To-Do</h3>
-                        <button class="btn-add-task" data-bs-toggle="modal" data-bs-target="#addTaskModal">
-                            + Add Task
-                        </button>
-                    </div>
-                    <div class="card-body">
-                        <% if (tasks && tasks.length > 0) { %>
-                            <% tasks.forEach(task => { %>
-                            <a href="/task/<%= task.task_id %>" class="task-item-link">
-                                <div class="task-item" id="task-item-<%= task.task_id %>">
-                                    <div class="task-content">
-                                        <% 
-                                            let priorityClass = 'low';
-                                            if (task.priority === 2) priorityClass = 'moderate';
-                                            if (task.priority === 3) priorityClass = 'extreme';
-                                        %>
-                                        <span class="priority-indicator <%= priorityClass %>"></span>
-                                        <div class="task-details">
-                                            <h4><%= task.title %></h4>
-                                            <p><%= task.description %></p>
-                                        </div>
-                                    </div>
-                                    <div class="task-actions">
-                                        <div class="dropdown">
-                                            <button class="task-options-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                                <i class="fas fa-ellipsis-v"></i>
-                                            </button>
-                                            <ul class="dropdown-menu dropdown-menu-end">
-                                                <li><a class="dropdown-item" href="#">Completed</a></li>
-                                                <li><a class="dropdown-item" href="#">In progress</a></li>
-                                                <li><a class="dropdown-item" href="#">Not started</a></li>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                </div>
-                            </a>
-                        <% }) %>
-                        <% } else { %>
-                            <div class="empty-task">
-                                Do you want to add a new Task?
-                            </div>
-                        <% } %>
-                    </div>
-                </div>
-
-                <div class="info-card task-status-card-v2">
-                    <div class="card-header">
-                        <h3>Task Status</h3>
-                    </div>
-                    <div class="card-body status-circles">
-                        <div class="circle-wrap">
-                            <div class="circle completed" style="--p:0;">
-                                <div class="inside-circle">0%</div>
-                            </div>
-                            <div class="circle-label completed-label">Completed</div>
-                        </div>
-                        <div class="circle-wrap">
-                            <div class="circle in-progress" style="--p:0;">
-                                 <div class="inside-circle">0%</div>
-                            </div>
-                            <div class="circle-label in-progress-label">In Progress</div>
-                        </div>
-                        <div class="circle-wrap">
-                             <div class="circle not-started" style="--p:0;">
-                                <div class="inside-circle">0%</div>
-                            </div>
-                            <div class="circle-label not-started-label">Not Started</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="info-card completed-task-card-v2">
-                     <div class="card-header">
-                        <h3>Completed Task</h3>
-                    </div>
-                     <div class="card-body">
-                         <% if (completedTasks && completedTasks.length > 0) { %>
-                            <% completedTasks.forEach(task => { %>
-                                <div class="completed-task-item-v2">
-                                    <i class="fas fa-check-circle"></i>
-                                    <span><%= task.title %></span>
-                                </div>
-                            <% }) %>
-                        <% } else { %>
-                            <div class="empty-task small">
-                                No tasks completed recently.
-                            </div>
-                        <% } %>
-                    </div>
-                </div>
-
-            </div>
-        </main>
-
-    </div>
-</div>
-
-
-<div class="modal fade" id="addTaskModal" tabindex="-1" aria-labelledby="addTaskModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="addTaskModalLabel">Add New Task</h5>
-                <a href="#" class="go-back-link" data-bs-dismiss="modal">Go Back</a>
-            </div>
-            <div class="modal-body">
-                <form id="addTaskForm" action="/tasks" method="POST">
-                    <div class="row">
-                        <div class="col-md-12"> 
-                            <div class="mb-3">
-                                <label for="taskTitle" class="form-label">Title</label>
-                                <input type="text" class="form-control" id="taskTitle" name="title" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="taskDate" class="form-label">Date</label>
-                                <input type="date" class="form-control" id="taskDate" name="due_date">
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Priority</label>
-                                <div class="priority-options">
-                                    <label class="priority-option">
-                                        <input type="radio" name="priority" value="3" checked>
-                                        <span class="priority-box extreme"></span> Extreme
-                                    </label>
-                                    <label class="priority-option">
-                                        <input type="radio" name="priority" value="2">
-                                        <span class="priority-box moderate"></span> Moderate
-                                    </label>
-                                    <label class="priority-option">
-                                        <input type="radio" name="priority" value="1">
-                                        <span class="priority-box low"></span> Low
-                                    </label>
-                                </div>
-                            </div>
-                             <div class="mb-3">
-                                <label for="taskDescription" class="form-label">Task Description</label>
-                                <textarea class="form-control" id="taskDescription" name="description" rows="4"></textarea>
-                            </div>
-                        </div>
-                        </div>
+            <div class="header-search">
+                <form class="search-form">
+                    <input type="text" placeholder="Search your task here...">
+                    <button type="submit" class="search-btn"><i class="fas fa-search"></i></button>
                 </form>
             </div>
-            <div class="modal-footer">
-                <button type="submit" form="addTaskForm" class="btn btn-done">Done</button>
+            <div class="header-actions">
+                <button class="action-btn"><i class="fas fa-filter"></i></button>
+                <button class="action-btn"><i class="fas fa-bell"></i></button>
+                <div class="date-display">
+                    <span>Wednesday</span>
+                    <span>24/09/2025</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="dashboard-body">
+
+            <aside class="sidebar-v2">
+                <div class="user-profile-v2">
+                    <div class="user-info-v2">
+                        <span class="user-name-v2">
+                            <%= user ? `${user.first_name} ${user.last_name}` : 'Username' %>
+                        </span><br>
+                        <span class="user-email-v2">
+                            <%= user ? user.email : 'user@example.com' %>
+                        </span>
+                    </div>
+                </div>
+                <nav class="sidebar-nav">
+                    <a href="/dashboard" class="nav-link active">
+                        <i class="fas fa-th-large"></i>
+                        <span>Dashboard</span>
+                    </a>
+                    <button class="nav-link" data-bs-toggle="modal" data-bs-target="#profileModal">
+                        <i class="fas fa-user-circle"></i>
+                        <span>My Profile</span>
+                    </button>
+                </nav>
+                <a href="/logout" class="logout-btn-v2">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </a>
+            </aside>
+
+            <main class="main-content-v2">
+                <h2 class="welcome-title">Welcome back, <%= user ? user.first_name : 'User' %> 👋</h2>
+
+                <div class="dashboard-grid">
+
+                    <div class="info-card to-do-card">
+                        <div class="card-header">
+                            <h3>To-Do</h3>
+                            <button class="btn-add-task" data-bs-toggle="modal" data-bs-target="#addTaskModal">
+                                + Add Task
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <% if (tasks && tasks.length> 0) { %>
+                                <% tasks.forEach(task=> { %>
+                                   <div class="task-item" id="task-item-<%= task.task_id %>">
+
+                                        <a href="/task/<%= task.task_id %>" class="task-item-link">
+                                            <div class="task-content">
+                                                <% 
+                                                    let priorityClass = 'low';
+                                                    if (task.priority === 'MODERATE') {
+                                                        priorityClass = 'moderate';
+                                                    } else if (task.priority === 'EXTREME') {
+                                                        priorityClass = 'extreme';
+                                                    }
+                                                %>
+                                                <span class="priority-indicator <%= priorityClass %>"></span>
+                                                <div class="task-details">
+                                                    <h4><%= task.title %></h4>
+                                                    <p><%= task.description %></p>
+                                                </div>
+                                            </div>
+                                        </a>
+
+                                        <div class="d-flex align-items-center">
+                                        
+                                            <% if (task.due_at) { %>
+                                                <div class="task-due-date">
+                                                    <i class="fas fa-calendar-alt"></i>
+                                                    <span>
+                                                        <%= new Date(task.due_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) %>
+                                                    </span>
+                                                </div>
+                                            <% } %>
+
+                                            <%
+                                                let statusText = 'Not Started';
+                                                let statusClass = 'not-started';
+                                                if (task.status === 'IN_PROGRESS') {
+                                                    statusText = 'In Progress';
+                                                    statusClass = 'in-progress';
+                                                } else if (task.status === 'COMPLETED') {
+                                                    statusText = 'Completed';
+                                                    statusClass = 'completed';
+                                                }
+                                            %>
+                                            <span class="status-badge status-<%= statusClass %>"><%= statusText %></span>
+
+                                            <div class="task-actions">
+                                                <div class="dropdown">
+                                                    <button class="task-options-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                        <i class="fas fa-ellipsis-v"></i>
+                                                    </button>
+                                                    <ul class="dropdown-menu dropdown-menu-end">
+                                                        <li><a class="dropdown-item" href="#" data-task-id="<%= task.task_id %>" data-status="COMPLETED">Completed</a></li>
+                                                        <li><a class="dropdown-item" href="#" data-task-id="<%= task.task_id %>" data-status="IN_PROGRESS">In Progress</a></li>
+                                                        <li><a class="dropdown-item" href="#" data-task-id="<%= task.task_id %>" data-status="NOT_STARTED">Not Started</a></li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                            
+                                        </div>
+
+                                    </div>
+                                    <% }) %>
+                                        <% } else { %>
+                                            <div class="empty-task">
+                                                Do you want to add a new Task?
+                                            </div>
+                                            <% } %>
+                        </div>
+                    </div>
+
+                    <div class="info-card task-status-card-v2">
+                        <div class="card-header">
+                            <h3>Task Status</h3>
+                        </div>
+                        <div class="card-body status-circles">
+                            <div class="circle-wrap">
+                                <div class="circle completed" style="--p:0;">
+                                    <div class="inside-circle">0%</div>
+                                </div>
+                                <div class="circle-label completed-label">Completed</div>
+                            </div>
+                            <div class="circle-wrap">
+                                <div class="circle in-progress" style="--p:0;">
+                                    <div class="inside-circle">0%</div>
+                                </div>
+                                <div class="circle-label in-progress-label">In Progress</div>
+                            </div>
+                            <div class="circle-wrap">
+                                <div class="circle not-started" style="--p:0;">
+                                    <div class="inside-circle">0%</div>
+                                </div>
+                                <div class="circle-label not-started-label">Not Started</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-card completed-task-card-v2">
+                        <div class="card-header">
+                            <h3>Completed Task</h3>
+                        </div>
+                        <div class="card-body">
+                            <% if (completedTasks && completedTasks.length> 0) { %>
+                                <% completedTasks.forEach(task=> { %>
+                                    <div class="task-item" id="task-item-<%= task.task_id %>">
+
+                                        <a href="/task/<%= task.task_id %>" class="task-item-link">
+                                            <div class="task-content">
+                                                <% 
+                                                    let priorityClass = 'low';
+                                                    if (task.priority === 'MODERATE') {
+                                                        priorityClass = 'moderate';
+                                                    } else if (task.priority === 'EXTREME') {
+                                                        priorityClass = 'extreme';
+                                                    }
+                                                %>
+                                                <span class="priority-indicator <%= priorityClass %>"></span>
+                                                <div class="task-details">
+                                                    <h4><%= task.title %></h4>
+                                                    <p><%= task.description %></p>
+                                                </div>
+                                            </div>
+                                        </a>
+
+                                        <div class="d-flex align-items-center">
+                                        
+                                            <% if (task.due_at) { %>
+                                                <div class="task-due-date">
+                                                    <i class="fas fa-calendar-alt"></i>
+                                                    <span>
+                                                        <%= new Date(task.due_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) %>
+                                                    </span>
+                                                </div>
+                                            <% } %>
+
+                                            <%
+                                                let statusText = 'Not Started';
+                                                let statusClass = 'not-started';
+                                                if (task.status === 'IN_PROGRESS') {
+                                                    statusText = 'In Progress';
+                                                    statusClass = 'in-progress';
+                                                } else if (task.status === 'COMPLETED') {
+                                                    statusText = 'Completed';
+                                                    statusClass = 'completed';
+                                                }
+                                            %>
+                                            <span class="status-badge status-<%= statusClass %>"><%= statusText %></span>
+
+                                            <div class="task-actions">
+                                                <div class="dropdown">
+                                                    <button class="task-options-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                        <i class="fas fa-ellipsis-v"></i>
+                                                    </button>
+                                                    <ul class="dropdown-menu dropdown-menu-end">
+                                                        <li><a class="dropdown-item" href="#" data-task-id="<%= task.task_id %>" data-status="COMPLETED">Completed</a></li>
+                                                        <li><a class="dropdown-item" href="#" data-task-id="<%= task.task_id %>" data-status="IN_PROGRESS">In Progress</a></li>
+                                                        <li><a class="dropdown-item" href="#" data-task-id="<%= task.task_id %>" data-status="NOT_STARTED">Not Started</a></li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                            
+                                        </div>
+
+                                    </div>
+                                    <% }) %>
+                                        <% } else { %>
+                                            <div class="empty-task small">
+                                                No tasks completed recently.
+                                            </div>
+                                            <% } %>
+                        </div>
+                    </div>
+
+                </div>
+            </main>
+
+        </div>
+    </div>
+
+    <!-- Modal pop-up Add Tasks -->
+    <div class="modal fade" id="addTaskModal" tabindex="-1" aria-labelledby="addTaskModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addTaskModalLabel">Add New Task</h5>
+                    <a href="#" class="go-back-link" data-bs-dismiss="modal">Go Back</a>
+                </div>
+                <div class="modal-body">
+                    <form id="addTaskForm" action="/tasks" method="POST">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="mb-3">
+                                    <label for="taskTitle" class="form-label">Title</label>
+                                    <input type="text" class="form-control" id="taskTitle" name="title" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="taskDate" class="form-label">Date</label>
+                                    <input type="date" class="form-control" id="taskDate" name="due_date" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Priority</label>
+                                    <div class="priority-options">
+                                        <label class="priority-option">
+                                            <input type="radio" name="priority" value="EXTREME" checked>
+                                            <span class="priority-box extreme"></span> Extreme
+                                        </label>
+                                        <label class="priority-option">
+                                            <input type="radio" name="priority" value="MODERATE">
+                                            <span class="priority-box moderate"></span> Moderate
+                                        </label>
+                                        <label class="priority-option">
+                                            <input type="radio" name="priority" value="LOW">
+                                            <span class="priority-box low"></span> Low
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="taskDescription" class="form-label">Task Description</label>
+                                    <textarea class="form-control" id="taskDescription" name="description" required
+                                        rows="4"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" form="addTaskForm" class="btn btn-done">Done</button>
+                </div>
             </div>
         </div>
     </div>
-</div>
+
+    <!-- Modal Pop-up User Profile -->
+    <div class="modal fade" id="profileModal" tabindex="-1" aria-labelledby="profileModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="profileModalLabel">My Profile</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="profileForm">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="firstName" class="form-label">First Name</label>
+                                <input type="text" class="form-control" id="firstName" name="first_name"
+                                    value="<%= user.first_name %>" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="lastName" class="form-label">Last Name</label>
+                                <input type="text" class="form-control" id="lastName" name="last_name"
+                                    value="<%= user.last_name %>" required>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email Address</label>
+                            <input type="email" class="form-control" id="email" name="email" value="<%= user.email %>"
+                                required>
+                        </div>
+                        <div class="mb-4">
+                            <label for="username" class="form-label">Username</label>
+                            <input type="text" class="form-control" id="username" name="username"
+                                value="<%= user.username %>" required>
+                        </div>
+                        <hr class="my-4">
+                        <p class="text-muted">Leave passwords blank if you don't want to change it.</p>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="password" class="form-label">New Password</label>
+                                <input type="password" class="form-control" id="password" name="password">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="confirmPassword" class="form-label">Confirm New Password</label>
+                                <input type="password" class="form-control" id="confirmPassword" name="confirmPassword">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" form="profileForm" class="btn btn-warning">Save Changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
 
-<%- include('partials/footer') %>
+
+    <%- include('partials/footer') %>

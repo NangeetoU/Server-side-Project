@@ -1,6 +1,6 @@
 # Server-side-Project
 Install ทั้งหมดนี้
-npm install express mysql2 dotenv ejs
+npm install express mysql2 dotenv ejs jsonwebtoken cookie-parser
 npm install --save-dev nodemon
 
 Database ใช้ DBeaver

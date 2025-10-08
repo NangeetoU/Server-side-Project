@@ -1,5 +1,6 @@
 // app.js
 const express = require('express');
+const cookieParser = require('cookie-parser');
 require('dotenv').config();
 
 // --- Imports ---
@@ -15,6 +16,7 @@ const port = process.env.PORT || 3000;
 app.set('view engine', 'ejs');
 app.use(express.static('public'));
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 app.use(express.json());
 
 // --- Mount API routes FIRST ---
@@ -23,6 +25,7 @@ app.use('/tasks', tasksRoutes);   // -> /tasks/...
 
 // --- Mount page routes LAST ---
 app.use('/', pageRoutes);         // -> หน้าเว็บปกติ เช่น '/', '/about', ฯลฯ
+app.use('/', usersRoutes); 
 
 // --- 404 fallback (สำหรับเส้นทางที่ไม่ match อะไรเลย) ---
 app.use((req, res) => {

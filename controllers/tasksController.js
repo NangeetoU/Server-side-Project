@@ -20,31 +20,38 @@ function parsePaging(q = {}) {
 }
 
 const TasksController = {
+  // controllers/tasksController.js
+
   async create(req, res, next) {
-    try {
-      const user_id = mustUserId(req, res);
-      if (user_id == null) return;
+      try {
+          const user_id = mustUserId(req, res);
+          if (user_id == null) return;
 
-      const { title } = req.body;
-      if (!title) return res.status(400).json({ error: 'title is required' });
+          // 1. ดึง description ออกมาจาก body ด้วย
+          const { title, description, due_date, priority } = req.body;
 
-      const task_id = await TasksModel.create({
-        user_id,
-        title,
-        description: req.body.description ?? null,
-        image_url:   req.body.image_url   ?? null,
-        status:      req.body.status      || 'NOT_STARTED',
-        priority:    req.body.priority    || 'LOW',
-        due_at:      req.body.due_at      ?? null
-      });
+          // 2. ในส่วน Validation "ไม่ต้องเช็ค" description
+          if (!title || !due_date || !priority) {
+              return res.status(400).json({ error: 'Title, due date, and priority are required.' });
+          }
 
-      const task = await TasksModel.findById(task_id, user_id);
-      res.status(201).json(task);
-    } catch (e) {
-      if (e.message === 'INVALID_STATUS')   return res.status(400).json({ error: 'Invalid status' });
-      if (e.message === 'INVALID_PRIORITY') return res.status(400).json({ error: 'Invalid priority' });
-      next(e);
-    }
+          // 3. ส่ง description ไปที่ Model (ถ้าไม่มีค่า ให้เป็น null)
+          const task_id = await TasksModel.create({
+              user_id,
+              title,
+              description: description || null, 
+              due_at: due_date,
+              priority,
+              image_url: req.body.image_url ?? null,
+              status: 'NOT_STARTED'
+          });
+
+          const task = await TasksModel.findById(task_id, user_id);
+          res.status(201).json(task);
+
+      } catch (e) {
+          next(e);
+      }
   },
 
   async getById(req, res, next) {

@@ -32,22 +32,26 @@ const TasksModel = {
   },
 
   //Update
-  async update(task_id, user_id, { title, description, image_url, status, priority, due_at }) {
-    if (status && !ALLOWED_STATUS.includes(status)) throw new Error('INVALID_STATUS');
-    if (priority && !ALLOWED_PRIORITY.includes(priority)) throw new Error('INVALID_PRIORITY');
+  async update(task_id, user_id, data) {
+    // 1. กรองเอาเฉพาะ key ที่มีค่าส่งมาจริงๆ (ไม่ใช่ null หรือ undefined)
+      const fields = Object.keys(data).filter(key => data[key] != null);
+      
+      // ถ้าไม่มีข้อมูลอะไรส่งมาให้อัปเดตเลย ก็ถือว่าสำเร็จ
+      if (fields.length === 0) return true;
 
-    const [res] = await pool.execute(
-      `UPDATE tasks
-          SET title       = COALESCE(:title, title),
-              description = COALESCE(:description, description),
-              image_url   = COALESCE(:image_url, image_url),
-              status      = COALESCE(:status, status),
-              priority    = COALESCE(:priority, priority),
-              due_at      = COALESCE(:due_at, due_at)
-        WHERE task_id = :task_id AND user_id = :user_id`,
-      { task_id, user_id, title, description, image_url, status, priority, due_at }
-    );
-    return res.affectedRows > 0;
+      // 2. สร้าง SET clause แบบไดนามิก (เช่น "status = ?, priority = ?")
+      const setClause = fields.map(field => `${field} = ?`).join(', ');
+      
+      // 3. เตรียมค่า parameters ที่จะส่งเข้าไปใน query
+      const params = fields.map(key => data[key]);
+
+      // 4. สร้าง query ทั้งหมด
+      const query = `UPDATE tasks SET ${setClause} WHERE task_id = ? AND user_id = ?`;
+
+      // 5. ยิง query พร้อมกับ parameters
+      const [res] = await pool.execute(query, [...params, task_id, user_id]);
+      
+      return res.affectedRows > 0;
   },
 
   //DELETE
@@ -68,6 +72,28 @@ const TasksModel = {
       { status, task_id, user_id }
     );
     return res.affectedRows > 0;
+  },
+  
+    // ฟังก์ชันสำหรับ Filter โดยเฉพาะ
+  async filterBy(user_id, options = {}) {
+      const { status, priority } = options;
+
+      let query = 'SELECT * FROM tasks WHERE user_id = ?';
+      const params = [user_id];
+
+      if (status) {
+          query += ' AND status = ?';
+          params.push(status);
+      }
+      if (priority) {
+          query += ' AND priority = ?';
+          params.push(priority);
+      }
+
+      query += ' ORDER BY due_at ASC, FIELD(priority, "EXTREME", "MODERATE", "LOW")';
+
+      const [rows] = await pool.query(query, params);
+      return rows || [];
   },
 
   // ===== FILLERS =====

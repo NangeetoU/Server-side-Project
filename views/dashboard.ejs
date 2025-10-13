@@ -6,14 +6,42 @@
             <div class="header-logo">
                 <h1 class="dodash-title" style="font-size: 2.5rem; margin: 0;">DoDash</h1>
             </div>
+
             <div class="header-search">
-                <form class="search-form">
-                    <input type="text" placeholder="Search your task here...">
+                <form id="searchForm" class="search-form">
+                    <input type="text" placeholder="Search your task here..." id="searchInput">
                     <button type="submit" class="search-btn"><i class="fas fa-search"></i></button>
                 </form>
             </div>
+
             <div class="header-actions">
-                <button class="action-btn"><i class="fas fa-filter"></i></button>
+                <div class="dropdown">
+                    <button class="action-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false"
+                        title="Filter tasks">
+                        <i class="fas fa-filter"></i>
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-end p-3" style="width: 280px;">
+                        <div class="mb-3">
+                            <label for="statusFilter" class="form-label">Status</label>
+                            <select class="form-select" id="statusFilter">
+                                <option value="" selected>All Statuses</option>
+                                <option value="NOT_STARTED">Not Started</option>
+                                <option value="IN_PROGRESS">In Progress</option>
+                                <option value="COMPLETED">Completed</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="priorityFilter" class="form-label">Priority</label>
+                            <select class="form-select" id="priorityFilter">
+                                <option value="" selected>All Priorities</option>
+                                <option value="EXTREME">Extreme</option>
+                                <option value="MODERATE">Moderate</option>
+                                <option value="LOW">Low</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
                 <button class="action-btn"><i class="fas fa-bell"></i></button>
                 <div class="date-display">
                     <span>Wednesday</span>
@@ -54,6 +82,10 @@
             <main class="main-content-v2">
                 <h2 class="welcome-title">Welcome back, <%= user ? user.first_name : 'User' %> 👋</h2>
 
+                <script>
+                    const taskStats = <%- JSON.stringify(stats || {}) %>;
+                </script>
+
                 <div class="dashboard-grid">
 
                     <div class="info-card to-do-card">
@@ -63,66 +95,70 @@
                                 + Add Task
                             </button>
                         </div>
-                        <div class="card-body">
+                        <div class="card-body" id="todo-list-body">
                             <% if (tasks && tasks.length> 0) { %>
                                 <% tasks.forEach(task=> { %>
-                                   <div class="task-item" id="task-item-<%= task.task_id %>">
+                                    <div class="task-item" id="task-item-<%= task.task_id %>">
 
                                         <a href="/task/<%= task.task_id %>" class="task-item-link">
                                             <div class="task-content">
-                                                <% 
-                                                    let priorityClass = 'low';
-                                                    if (task.priority === 'MODERATE') {
-                                                        priorityClass = 'moderate';
-                                                    } else if (task.priority === 'EXTREME') {
-                                                        priorityClass = 'extreme';
-                                                    }
-                                                %>
-                                                <span class="priority-indicator <%= priorityClass %>"></span>
-                                                <div class="task-details">
-                                                    <h4><%= task.title %></h4>
-                                                    <p><%= task.description %></p>
-                                                </div>
+                                                <% let priorityClass='low' ; if (task.priority==='MODERATE' ) {
+                                                    priorityClass='moderate' ; } else if (task.priority==='EXTREME' ) {
+                                                    priorityClass='extreme' ; } %>
+                                                    <span class="priority-indicator <%= priorityClass %>"></span>
+                                                    <div class="task-details">
+                                                        <h4>
+                                                            <%= task.title %>
+                                                        </h4>
+                                                        <p>
+                                                            <%= task.description %>
+                                                        </p>
+                                                    </div>
                                             </div>
                                         </a>
 
                                         <div class="d-flex align-items-center">
-                                        
+
                                             <% if (task.due_at) { %>
                                                 <div class="task-due-date">
                                                     <i class="fas fa-calendar-alt"></i>
                                                     <span>
-                                                        <%= new Date(task.due_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) %>
+                                                        <%= new Date(task.due_at).toLocaleDateString('en-US', {
+                                                            month: 'short' , day: 'numeric' }) %>
                                                     </span>
                                                 </div>
-                                            <% } %>
+                                                <% } %>
 
-                                            <%
-                                                let statusText = 'Not Started';
-                                                let statusClass = 'not-started';
-                                                if (task.status === 'IN_PROGRESS') {
-                                                    statusText = 'In Progress';
-                                                    statusClass = 'in-progress';
-                                                } else if (task.status === 'COMPLETED') {
-                                                    statusText = 'Completed';
-                                                    statusClass = 'completed';
-                                                }
-                                            %>
-                                            <span class="status-badge status-<%= statusClass %>"><%= statusText %></span>
+                                                    <% let statusText='Not Started' ; let statusClass='not-started' ; if
+                                                        (task.status==='IN_PROGRESS' ) { statusText='In Progress' ;
+                                                        statusClass='in-progress' ; } else if (task.status==='COMPLETED'
+                                                        ) { statusText='Completed' ; statusClass='completed' ; } %>
+                                                        <span class="status-badge status-<%= statusClass %>">
+                                                            <%= statusText %>
+                                                        </span>
 
-                                            <div class="task-actions">
-                                                <div class="dropdown">
-                                                    <button class="task-options-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                                        <i class="fas fa-ellipsis-v"></i>
-                                                    </button>
-                                                    <ul class="dropdown-menu dropdown-menu-end">
-                                                        <li><a class="dropdown-item" href="#" data-task-id="<%= task.task_id %>" data-status="COMPLETED">Completed</a></li>
-                                                        <li><a class="dropdown-item" href="#" data-task-id="<%= task.task_id %>" data-status="IN_PROGRESS">In Progress</a></li>
-                                                        <li><a class="dropdown-item" href="#" data-task-id="<%= task.task_id %>" data-status="NOT_STARTED">Not Started</a></li>
-                                                    </ul>
-                                                </div>
-                                            </div>
-                                            
+                                                        <div class="task-actions">
+                                                            <div class="dropdown">
+                                                                <button class="task-options-btn" type="button"
+                                                                    data-bs-toggle="dropdown" aria-expanded="false">
+                                                                    <i class="fas fa-ellipsis-v"></i>
+                                                                </button>
+                                                                <ul class="dropdown-menu dropdown-menu-end">
+                                                                    <li><a class="dropdown-item" href="#"
+                                                                            data-task-id="<%= task.task_id %>"
+                                                                            data-status="COMPLETED">Completed</a></li>
+                                                                    <li><a class="dropdown-item" href="#"
+                                                                            data-task-id="<%= task.task_id %>"
+                                                                            data-status="IN_PROGRESS">In Progress</a>
+                                                                    </li>
+                                                                    <li><a class="dropdown-item" href="#"
+                                                                            data-task-id="<%= task.task_id %>"
+                                                                            data-status="NOT_STARTED">Not Started</a>
+                                                                    </li>
+                                                                </ul>
+                                                            </div>
+                                                        </div>
+
                                         </div>
 
                                     </div>
@@ -165,66 +201,70 @@
                         <div class="card-header">
                             <h3>Completed Task</h3>
                         </div>
-                        <div class="card-body">
+                        <div class="card-body" id="completed-list-body">
                             <% if (completedTasks && completedTasks.length> 0) { %>
                                 <% completedTasks.forEach(task=> { %>
                                     <div class="task-item" id="task-item-<%= task.task_id %>">
 
                                         <a href="/task/<%= task.task_id %>" class="task-item-link">
                                             <div class="task-content">
-                                                <% 
-                                                    let priorityClass = 'low';
-                                                    if (task.priority === 'MODERATE') {
-                                                        priorityClass = 'moderate';
-                                                    } else if (task.priority === 'EXTREME') {
-                                                        priorityClass = 'extreme';
-                                                    }
-                                                %>
-                                                <span class="priority-indicator <%= priorityClass %>"></span>
-                                                <div class="task-details">
-                                                    <h4><%= task.title %></h4>
-                                                    <p><%= task.description %></p>
-                                                </div>
+                                                <% let priorityClass='low' ; if (task.priority==='MODERATE' ) {
+                                                    priorityClass='moderate' ; } else if (task.priority==='EXTREME' ) {
+                                                    priorityClass='extreme' ; } %>
+                                                    <span class="priority-indicator <%= priorityClass %>"></span>
+                                                    <div class="task-details">
+                                                        <h4>
+                                                            <%= task.title %>
+                                                        </h4>
+                                                        <p>
+                                                            <%= task.description %>
+                                                        </p>
+                                                    </div>
                                             </div>
                                         </a>
 
                                         <div class="d-flex align-items-center">
-                                        
+
                                             <% if (task.due_at) { %>
                                                 <div class="task-due-date">
                                                     <i class="fas fa-calendar-alt"></i>
                                                     <span>
-                                                        <%= new Date(task.due_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) %>
+                                                        <%= new Date(task.due_at).toLocaleDateString('en-US', {
+                                                            month: 'short' , day: 'numeric' }) %>
                                                     </span>
                                                 </div>
-                                            <% } %>
+                                                <% } %>
 
-                                            <%
-                                                let statusText = 'Not Started';
-                                                let statusClass = 'not-started';
-                                                if (task.status === 'IN_PROGRESS') {
-                                                    statusText = 'In Progress';
-                                                    statusClass = 'in-progress';
-                                                } else if (task.status === 'COMPLETED') {
-                                                    statusText = 'Completed';
-                                                    statusClass = 'completed';
-                                                }
-                                            %>
-                                            <span class="status-badge status-<%= statusClass %>"><%= statusText %></span>
+                                                    <% let statusText='Not Started' ; let statusClass='not-started' ; if
+                                                        (task.status==='IN_PROGRESS' ) { statusText='In Progress' ;
+                                                        statusClass='in-progress' ; } else if (task.status==='COMPLETED'
+                                                        ) { statusText='Completed' ; statusClass='completed' ; } %>
+                                                        <span class="status-badge status-<%= statusClass %>">
+                                                            <%= statusText %>
+                                                        </span>
 
-                                            <div class="task-actions">
-                                                <div class="dropdown">
-                                                    <button class="task-options-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                                        <i class="fas fa-ellipsis-v"></i>
-                                                    </button>
-                                                    <ul class="dropdown-menu dropdown-menu-end">
-                                                        <li><a class="dropdown-item" href="#" data-task-id="<%= task.task_id %>" data-status="COMPLETED">Completed</a></li>
-                                                        <li><a class="dropdown-item" href="#" data-task-id="<%= task.task_id %>" data-status="IN_PROGRESS">In Progress</a></li>
-                                                        <li><a class="dropdown-item" href="#" data-task-id="<%= task.task_id %>" data-status="NOT_STARTED">Not Started</a></li>
-                                                    </ul>
-                                                </div>
-                                            </div>
-                                            
+                                                        <div class="task-actions">
+                                                            <div class="dropdown">
+                                                                <button class="task-options-btn" type="button"
+                                                                    data-bs-toggle="dropdown" aria-expanded="false">
+                                                                    <i class="fas fa-ellipsis-v"></i>
+                                                                </button>
+                                                                <ul class="dropdown-menu dropdown-menu-end">
+                                                                    <li><a class="dropdown-item" href="#"
+                                                                            data-task-id="<%= task.task_id %>"
+                                                                            data-status="COMPLETED">Completed</a></li>
+                                                                    <li><a class="dropdown-item" href="#"
+                                                                            data-task-id="<%= task.task_id %>"
+                                                                            data-status="IN_PROGRESS">In Progress</a>
+                                                                    </li>
+                                                                    <li><a class="dropdown-item" href="#"
+                                                                            data-task-id="<%= task.task_id %>"
+                                                                            data-status="NOT_STARTED">Not Started</a>
+                                                                    </li>
+                                                                </ul>
+                                                            </div>
+                                                        </div>
+
                                         </div>
 
                                     </div>
@@ -295,6 +335,62 @@
             </div>
         </div>
     </div>
+
+    <!-- Modal pop-up Edit Tasks -->
+    <div class="modal fade" id="editTaskModal" tabindex="-1" aria-labelledby="editTaskModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editTaskModalLabel">Edit Task</h5>
+                    <a href="#" class="go-back-link" data-bs-dismiss="modal">Go Back</a>
+                </div>
+                <div class="modal-body">
+                    <form id="editTaskForm">
+                        <input type="hidden" name="task_id">
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="mb-3">
+                                    <label for="editTaskTitle" class="form-label">Title</label>
+                                    <input type="text" class="form-control" id="editTaskTitle" name="title" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="editTaskDate" class="form-label">Date</label>
+                                    <input type="date" class="form-control" id="editTaskDate" name="due_date" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Priority</label>
+                                    <div class="priority-options">
+                                        <label class="priority-option">
+                                            <input type="radio" name="priority" value="EXTREME">
+                                            <span class="priority-box extreme"></span> Extreme
+                                        </label>
+                                        <label class="priority-option">
+                                            <input type="radio" name="priority" value="MODERATE">
+                                            <span class="priority-box moderate"></span> Moderate
+                                        </label>
+                                        <label class="priority-option">
+                                            <input type="radio" name="priority" value="LOW">
+                                            <span class="priority-box low"></span> Low
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="editTaskDescription" class="form-label">Task Description</label>
+                                    <textarea class="form-control" id="editTaskDescription" name="description"
+                                        rows="4"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" form="editTaskForm" class="btn btn-done">Save Changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 
     <!-- Modal Pop-up User Profile -->
     <div class="modal fade" id="profileModal" tabindex="-1" aria-labelledby="profileModalLabel" aria-hidden="true">

@@ -10,14 +10,6 @@ function mustUserId(req, res) {
   return Number(uid);
 }
 
-// Parse paging/sorting query params with sane defaults and limits
-function parsePaging(q = {}) {
-  const page = Math.max(1, Number.parseInt(q.page ?? 1) || 1);
-  const pageSize = Math.max(1, Math.min(100, Number.parseInt(q.pageSize ?? 10) || 10)); // cap 100
-  const orderBy = String(q.orderBy ?? 'created_at');
-  const orderDir = String(q.orderDir ?? 'DESC').toUpperCase() === 'ASC' ? 'ASC' : 'DESC';
-  return { page, pageSize, orderBy, orderDir };
-}
 
 const TasksController = {
   // controllers/tasksController.js
@@ -94,20 +86,21 @@ const TasksController = {
 
   async patchStatus(req, res, next) {
     try {
-      const user_id = mustUserId(req, res);
-      if (user_id == null) return;
+        const user_id = mustUserId(req, res);
+        if (user_id == null) return;
 
-      const task_id = Number(req.params.id);
-      const { status } = req.body;
-      if (!status) return res.status(400).json({ error: 'status is required' });
+        const task_id = Number(req.params.id);
+        const { status } = req.body;
+        if (!status) return res.status(400).json({ error: 'status is required' });
 
-      const ok = await TasksModel.patchStatus(task_id, user_id, status);
-      if (!ok) return res.status(400).json({ error: 'Invalid status or task not found' });
+        const ok = await TasksModel.update(task_id, user_id, { status });
 
-      const task = await TasksModel.findById(task_id, user_id);
-      res.json(task);
+        if (!ok) return res.status(400).json({ error: 'Invalid status or task not found' });
+
+        const task = await TasksModel.findById(task_id, user_id);
+        res.json(task);
     } catch (e) { next(e); }
-  },
+},
 
   async remove(req, res, next) {
     try {
@@ -121,69 +114,30 @@ const TasksController = {
     } catch (e) { next(e); }
   },
 
-  // GET /tasks/dashboard
-  async getdashboard(req, res, next) {
-    try {
-      const user_id = mustUserId(req, res); if (user_id == null) return;
-      const limit = Number(req.query.limit || 20);
-
-      const [notStarted, inProgress, stats] = await Promise.all([
-        TasksModel.fillernotstarted(user_id, { page: 1, pageSize: limit, orderBy: 'updated_at', orderDir: 'DESC' }),
-        TasksModel.fillerinprogress(user_id, { page: 1, pageSize: limit, orderBy: 'updated_at', orderDir: 'DESC' }),
-        TasksModel.countByStatus(user_id),
-      ]);
-
-      res.json({
-        user_id,
-        limit,
-        sections: {
-          not_started: notStarted,
-          in_progress: inProgress,
-          stats
-        }
-      });
-    } catch (e) { next(e); }
-  },
-
   // SEARCH: GET /tasks/search?q=...
   async search(req, res, next) {
     try {
       const user_id = mustUserId(req, res); if (user_id == null) return;
       const q = String(req.query.q || '').trim();
       const data = await TasksModel.searchByTitle(user_id, q);
-      res.json({ q, count: data.length, data });
+      res.json(data);
     } catch (e) { next(e); }
   },
 
-  // GET /tasks/not-started
-  async getNotStarted(req, res, next) {
-    try {
-      const user_id = mustUserId(req, res); if (user_id == null) return;
-      const opts = parsePaging(req.query);
-      const out = await TasksModel.fillernotstarted(user_id, opts);
-      res.json(out);
-    } catch (e) { next(e); }
-  },
+  async filter(req, res, next) {
+        try {
+            const user_id = mustUserId(req, res);
+            if (user_id == null) return;
 
-  // GET /tasks/in-progress
-  async getInProgress(req, res, next) {
-    try {
-      const user_id = mustUserId(req, res); if (user_id == null) return;
-      const opts = parsePaging(req.query);
-      const out = await TasksModel.fillerinprogress(user_id, opts);
-      res.json(out);
-    } catch (e) { next(e); }
-  },
+            const { status, priority } = req.query;
+            const data = await TasksModel.filterBy(user_id, { status, priority });
+            res.json(data);
+        } catch (e) {
+            next(e);
+        }
+    },
 
-  // GET /tasks/completed
-  async getCompleted(req, res, next) {
-    try {
-      const user_id = mustUserId(req, res); if (user_id == null) return;
-      const opts = parsePaging(req.query);
-      const out = await TasksModel.fillercompleted(user_id, opts);
-      res.json(out);
-    } catch (e) { next(e); }
-  }
+  
 };
 
 

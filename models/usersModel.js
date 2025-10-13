@@ -47,14 +47,7 @@ const UsersModel = {
     return res.affectedRows > 0;
     },
 
-  // DELETE by id
-  async remove(user_id) {
-    const [res] = await pool.execute(
-      `DELETE FROM users WHERE user_id = :user_id`,
-      { user_id }
-    );
-    return res.affectedRows > 0;
-  },
+
 
 };
 

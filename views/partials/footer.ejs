@@ -1,154 +1,154 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', () => {
 
-    // ==========================================================
-    // ส่วนที่ 1: โค้ดสำหรับ Profile Modal
-    // ==========================================================
-    const profileForm = document.getElementById('profileForm');
-    if (profileForm) {
-        profileForm.addEventListener('submit', async (event) => {
-            event.preventDefault();
-            const formData = new FormData(profileForm);
-            const data = Object.fromEntries(formData.entries());
+        // ==========================================================
+        // ส่วนที่ 1: โค้ดสำหรับ Profile Modal
+        // ==========================================================
+        const profileForm = document.getElementById('profileForm');
+        if (profileForm) {
+            profileForm.addEventListener('submit', async (event) => {
+                event.preventDefault();
+                const formData = new FormData(profileForm);
+                const data = Object.fromEntries(formData.entries());
 
-            if (!data.password) {
-                delete data.password;
-                delete data.confirmPassword;
-            }
-
-            try {
-                const response = await fetch('/users/me', {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data)
-                });
-                if (!response.ok) {
-                    const errorResult = await response.json();
-                    throw new Error(errorResult.error || 'Failed to update profile.');
-                }
-                const updatedUser = await response.json();
-
-                document.querySelector('.user-name-v2').textContent = `${updatedUser.first_name} ${updatedUser.last_name}`;
-                document.querySelector('.user-email-v2').textContent = updatedUser.email;
-                document.querySelector('.welcome-title').textContent = `Welcome back, ${updatedUser.first_name} 👋`;
-
-                const profileModal = bootstrap.Modal.getInstance(document.getElementById('profileModal'));
-                profileModal.hide();
-                alert('Profile updated successfully!');
-            } catch (error) {
-                console.error('Error updating profile:', error);
-                alert(`Error: ${error.message}`);
-            }
-        });
-    }
-
-    // ==========================================================
-    // ส่วนที่ 2: โค้ดสำหรับจัดการ Task Status
-    // ==========================================================
-    const mainContent = document.querySelector('.main-content-v2');
-    if (mainContent) {
-        mainContent.addEventListener('click', async (event) => {
-            const target = event.target.closest('.dropdown-item[data-task-id]');
-            if (!target) return;
-
-            event.preventDefault();
-            const taskId = target.dataset.taskId;
-            const newStatus = target.dataset.status;
-
-            try {
-                const response = await fetch(`/tasks/${taskId}/status`, {
-                    method: 'PATCH',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ status: newStatus })
-                });
-                if (!response.ok) {
-                    const errorResult = await response.json();
-                    throw new Error(errorResult.error || 'Failed to update task status.');
-                }
-                alert('Task status updated!');
-                location.reload();
-            } catch (error) {
-                console.error('Error updating task status:', error);
-                alert(`Error: ${error.message}`);
-            }
-        });
-    }
-
-    // ==========================================================
-    // ส่วนที่ 3: โค้ดสำหรับ Add Task Form
-    // ==========================================================
-    const addTaskForm = document.getElementById('addTaskForm');
-    if (addTaskForm) {
-        addTaskForm.addEventListener('submit', async (event) => {
-            event.preventDefault();
-            const formData = new FormData(addTaskForm);
-            const data = Object.fromEntries(formData.entries());
-
-            try {
-                const response = await fetch('/tasks', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data)
-                });
-                if (!response.ok) {
-                    const errorResult = await response.json();
-                    throw new Error(errorResult.error || 'Failed to create task.');
-                }
-                const newTask = await response.json();
-                const taskElement = createTaskElement(newTask);
-                
-                const todoList = document.querySelector('.to-do-card .card-body');
-                const emptyTaskEl = todoList.querySelector('.empty-task');
-                if (emptyTaskEl) emptyTaskEl.remove();
-                
-                todoList.prepend(taskElement);
-
-                if (window.FontAwesome) {
-                    FontAwesome.dom.i2svg();
+                if (!data.password) {
+                    delete data.password;
+                    delete data.confirmPassword;
                 }
 
-                const addTaskModal = bootstrap.Modal.getInstance(document.getElementById('addTaskModal'));
-                addTaskModal.hide();
-                addTaskForm.reset();
-            } catch (error) {
-                console.error('Error creating task:', error);
-                alert(`Error: ${error.message}`);
+                try {
+                    const response = await fetch('/users/me', {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(data)
+                    });
+                    if (!response.ok) {
+                        const errorResult = await response.json();
+                        throw new Error(errorResult.error || 'Failed to update profile.');
+                    }
+                    const updatedUser = await response.json();
+
+                    document.querySelector('.user-name-v2').textContent = `${updatedUser.first_name} ${updatedUser.last_name}`;
+                    document.querySelector('.user-email-v2').textContent = updatedUser.email;
+                    document.querySelector('.welcome-title').textContent = `Welcome back, ${updatedUser.first_name} 👋`;
+
+                    const profileModal = bootstrap.Modal.getInstance(document.getElementById('profileModal'));
+                    profileModal.hide();
+                    alert('Profile updated successfully!');
+                } catch (error) {
+                    console.error('Error updating profile:', error);
+                    alert(`Error: ${error.message}`);
+                }
+            });
+        }
+
+        // ==========================================================
+        // ส่วนที่ 2: โค้ดสำหรับจัดการ Task Status
+        // ==========================================================
+        const mainContent = document.querySelector('.main-content-v2');
+        if (mainContent) {
+            mainContent.addEventListener('click', async (event) => {
+                const target = event.target.closest('.dropdown-item[data-task-id]');
+                if (!target) return;
+
+                event.preventDefault();
+                const taskId = target.dataset.taskId;
+                const newStatus = target.dataset.status;
+
+                try {
+                    const response = await fetch(`/tasks/${taskId}/status`, {
+                        method: 'PATCH',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ status: newStatus })
+                    });
+                    if (!response.ok) {
+                        const errorResult = await response.json();
+                        throw new Error(errorResult.error || 'Failed to update task status.');
+                    }
+                    alert('Task status updated!');
+                    location.reload();
+                } catch (error) {
+                    console.error('Error updating task status:', error);
+                    alert(`Error: ${error.message}`);
+                }
+            });
+        }
+
+        // ==========================================================
+        // ส่วนที่ 3: โค้ดสำหรับ Add Task Form
+        // ==========================================================
+        const addTaskForm = document.getElementById('addTaskForm');
+        if (addTaskForm) {
+            addTaskForm.addEventListener('submit', async (event) => {
+                event.preventDefault();
+                const formData = new FormData(addTaskForm);
+                const data = Object.fromEntries(formData.entries());
+
+                try {
+                    const response = await fetch('/tasks', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(data)
+                    });
+                    if (!response.ok) {
+                        const errorResult = await response.json();
+                        throw new Error(errorResult.error || 'Failed to create task.');
+                    }
+                    const newTask = await response.json();
+                    const taskElement = createTaskElement(newTask);
+
+                    const todoList = document.querySelector('.to-do-card .card-body');
+                    const emptyTaskEl = todoList.querySelector('.empty-task');
+                    if (emptyTaskEl) emptyTaskEl.remove();
+
+                    todoList.prepend(taskElement);
+
+                    if (window.FontAwesome) {
+                        FontAwesome.dom.i2svg();
+                    }
+
+                    const addTaskModal = bootstrap.Modal.getInstance(document.getElementById('addTaskModal'));
+                    addTaskModal.hide();
+                    addTaskForm.reset();
+                } catch (error) {
+                    console.error('Error creating task:', error);
+                    alert(`Error: ${error.message}`);
+                }
+            });
+        }
+
+        /**
+         * ฟังก์ชันผู้ช่วยสำหรับสร้าง HTML element ของ Task
+         */
+        function createTaskElement(task) {
+            const div = document.createElement('div');
+            div.className = 'task-item';
+            div.id = `task-item-${task.task_id}`;
+
+            // --- Logic สำหรับ Status, Priority, และ Date ---
+            let statusText = 'Not Started';
+            let statusClass = 'not-started';
+            if (task.status === 'IN_PROGRESS') {
+                statusText = 'In Progress';
+                statusClass = 'in-progress';
+            } else if (task.status === 'COMPLETED') {
+                statusText = 'Completed';
+                statusClass = 'completed';
             }
-        });
-    }
 
-    /**
-     * ฟังก์ชันผู้ช่วยสำหรับสร้าง HTML element ของ Task
-     */
-    function createTaskElement(task) {
-    const div = document.createElement('div');
-    div.className = 'task-item';
-    div.id = `task-item-${task.task_id}`;
+            let priorityClass = 'low';
+            if (task.priority === 'MODERATE') priorityClass = 'moderate';
+            if (task.priority === 'EXTREME') priorityClass = 'extreme';
 
-    // --- Logic สำหรับ Status, Priority, และ Date ---
-    let statusText = 'Not Started';
-    let statusClass = 'not-started';
-    if (task.status === 'IN_PROGRESS') {
-        statusText = 'In Progress';
-        statusClass = 'in-progress';
-    } else if (task.status === 'COMPLETED') {
-        statusText = 'Completed';
-        statusClass = 'completed';
-    }
+            let dueDateHtml = '';
+            if (task.due_at) {
+                const formattedDate = new Date(task.due_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                dueDateHtml = `<div class="task-due-date"><i class="fas fa-calendar-alt"></i><span>${formattedDate}</span></div>`;
+            }
 
-    let priorityClass = 'low';
-    if (task.priority === 'MODERATE') priorityClass = 'moderate';
-    if (task.priority === 'EXTREME') priorityClass = 'extreme';
-
-    let dueDateHtml = '';
-    if (task.due_at) {
-        const formattedDate = new Date(task.due_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-        dueDateHtml = `<div class="task-due-date"><i class="fas fa-calendar-alt"></i><span>${formattedDate}</span></div>`;
-    }
-
-    div.innerHTML = `
+            div.innerHTML = `
         <a href="/task/${task.task_id}" class="task-item-link">
             <div class="task-content">
                 <span class="priority-indicator ${priorityClass}"></span>
@@ -176,7 +176,226 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
     `;
 
-    return div;
-    }
-});
+            return div;
+        }
+
+        // ==========================================================
+        // (เพิ่มใหม่) ส่วนที่ 4: โค้ดสำหรับอัปเดต Task Status Widget
+        // ==========================================================
+
+
+        function updateTaskStatusWidget(stats) {
+            const total = (stats.NOT_STARTED || 0) + (stats.IN_PROGRESS || 0) + (stats.COMPLETED || 0);
+
+            // คำนวณเปอร์เซ็นต์
+            const completedPercent = total > 0 ? ((stats.COMPLETED || 0) / total) * 100 : 0;
+            const inProgressPercent = total > 0 ? ((stats.IN_PROGRESS || 0) / total) * 100 : 0;
+            const notStartedPercent = total > 0 ? ((stats.NOT_STARTED || 0) / total) * 100 : 0;
+
+            // อัปเดต UI ของ 'Completed'
+            const completedCircle = document.querySelector('.circle.completed');
+            if (completedCircle) {
+                completedCircle.style.setProperty('--p', completedPercent);
+                completedCircle.querySelector('.inside-circle').textContent = `${Math.round(completedPercent)}%`;
+            }
+
+            // อัปเดต UI ของ 'In Progress'
+            const inProgressCircle = document.querySelector('.circle.in-progress');
+            if (inProgressCircle) {
+                inProgressCircle.style.setProperty('--p', inProgressPercent);
+                inProgressCircle.querySelector('.inside-circle').textContent = `${Math.round(inProgressPercent)}%`;
+            }
+
+            // อัปเดต UI ของ 'Not Started'
+            const notStartedCircle = document.querySelector('.circle.not-started');
+            if (notStartedCircle) {
+                notStartedCircle.style.setProperty('--p', notStartedPercent);
+                notStartedCircle.querySelector('.inside-circle').textContent = `${Math.round(notStartedPercent)}%`;
+            }
+        }
+
+        // เรียกใช้ฟังก์ชันทันทีที่หน้าเว็บโหลดเสร็จ
+        // โดยใช้ตัวแปร taskStats ที่เราส่งมาจาก EJS
+        if (typeof taskStats !== 'undefined') {
+            updateTaskStatusWidget(taskStats);
+        }
+
+
+        // ==========================================================
+        // (เพิ่มใหม่) ส่วนที่ 5: โค้ดสำหรับเปิดและจัดการ Edit Task Modal
+        // ==========================================================
+
+        const editTaskModalEl = document.getElementById('editTaskModal');
+        const editTaskForm = document.getElementById('editTaskForm');
+        const editModal = new bootstrap.Modal(editTaskModalEl);
+
+        // --- Logic ที่ 1: เมื่อคลิกที่ Task Item ---
+        document.querySelector('.main-content-v2').addEventListener('click', async (event) => {
+            // หา task-item-link ที่ถูกคลิก
+            const taskLink = event.target.closest('.task-item-link');
+            if (!taskLink) return;
+
+            event.preventDefault(); // ป้องกันไม่ให้เบราว์เซอร์เปลี่ยนหน้า
+
+            // ดึง task id จาก href
+            const taskId = taskLink.href.split('/').pop();
+
+            try {
+                // ยิง API ไปขอข้อมูลของ Task นี้
+                const response = await fetch(`/tasks/${taskId}`);
+                if (!response.ok) throw new Error('Task not found.');
+
+                const taskData = await response.json();
+
+                // นำข้อมูลที่ได้ไปใส่ในฟอร์มของ Edit Modal
+                editTaskForm.querySelector('[name="task_id"]').value = taskData.task_id;
+                editTaskForm.querySelector('[name="title"]').value = taskData.title;
+                editTaskForm.querySelector('[name="description"]').value = taskData.description;
+                // แปลง Format วันที่สำหรับ input type="date"
+                editTaskForm.querySelector('[name="due_date"]').value = new Date(taskData.due_at).toISOString().split('T')[0];
+                // เลือก Radio button ของ priority ให้ตรงกับข้อมูล
+                editTaskForm.querySelector(`[name="priority"][value="${taskData.priority}"]`).checked = true;
+
+                // เปิด Modal ขึ้นมา
+                editModal.show();
+
+            } catch (error) {
+                console.error('Error fetching task data:', error);
+                alert(error.message);
+            }
+        });
+
+        // --- Logic ที่ 2: เมื่อกด "Save Changes" ใน Edit Modal ---
+        editTaskForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const formData = new FormData(editTaskForm);
+            const data = Object.fromEntries(formData.entries());
+            const taskId = data.task_id;
+
+            try {
+                // ยิง API ไปอัปเดตข้อมูล Task
+                const response = await fetch(`/tasks/${taskId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                if (!response.ok) throw new Error('Failed to update task.');
+
+                // ปิด Modal แล้วรีโหลดหน้าเพื่อให้เห็นข้อมูลล่าสุด
+                editModal.hide();
+                alert('Task updated successfully!');
+                location.reload();
+
+            } catch (error) {
+                console.error('Error updating task:', error);
+                alert(error.message);
+            }
+        });
+
+        // ==========================================================
+        // ส่วนที่ 6: โค้ดสำหรับจัดการ Search & Filter (อัปเกรดเป็น 'AND' Logic)
+        // ==========================================================
+        const searchForm = document.getElementById('searchForm');
+        const searchInput = document.getElementById('searchInput');
+        const statusFilter = document.getElementById('statusFilter'); // นี่คือ <select>
+        const priorityFilter = document.getElementById('priorityFilter'); // นี่คือ <select>
+
+        // --- Logic ที่ 1: การค้นหา (Search) - เหมือนเดิม ---
+        searchForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const searchTerm = searchInput.value;
+            if (searchTerm) {
+                fetchAndRenderTasks(`/tasks/search?q=${encodeURIComponent(searchTerm)}`);
+            } else {
+                location.reload();
+            }
+        });
+
+        // --- (เพิ่มใหม่) ฟังก์ชันสำหรับรวบรวมและใช้ฟิลเตอร์ ---
+        function applyCombinedFilters() {
+            // 1. สร้าง object สำหรับเก็บ query parameters
+            const params = new URLSearchParams();
+
+            // 2. อ่านค่าจากฟิลเตอร์ทั้งสองอัน
+            const statusValue = statusFilter.value;
+            const priorityValue = priorityFilter.value;
+
+            // 3. ถ้ามีค่า ให้เพิ่มเข้าไปใน params
+            if (statusValue) {
+                params.append('status', statusValue);
+            }
+            if (priorityValue) {
+                params.append('priority', priorityValue);
+            }
+
+            // 4. แปลง params เป็น string (เช่น "status=IN_PROGRESS&priority=EXTREME")
+            const queryString = params.toString();
+
+            // 5. ถ้าไม่มีการเลือกฟิลเตอร์เลย ให้รีโหลดหน้าเพื่อแสดงทั้งหมด
+            //    ถ้ามีการเลือกอย่างน้อย 1 อย่าง ให้ยิง API
+            if (queryString) {
+                fetchAndRenderTasks(`/tasks/filter?${queryString}`);
+            } else {
+                location.reload();
+            }
+        }
+
+        // --- Logic ที่ 2: การกรอง (Filter) - อัปเดตใหม่ ---
+        // เมื่อมีการเลือกค่าใน dropdown ของ Status ให้เรียกฟังก์ชันรวบรวม
+        statusFilter.addEventListener('change', applyCombinedFilters);
+
+        // เมื่อมีการเลือกค่าใน dropdown ของ Priority ก็ให้เรียกฟังก์ชันรวบรวมเช่นกัน
+        priorityFilter.addEventListener('change', applyCombinedFilters);
+
+        // ทำงานเมื่อมีการเลือกค่าใน dropdown ของ Priority
+        priorityFilter.addEventListener('change', () => {
+            const priorityValue = priorityFilter.value;
+            if (priorityValue) {
+                fetchAndRenderTasks(`/tasks/filter?priority=${priorityValue}`);
+            } else {
+                location.reload();
+            }
+        });
+
+        /**
+         * ฟังก์ชันสำหรับยิง API และวาดผลลัพธ์ใหม่ทั้งหมด
+         */
+        async function fetchAndRenderTasks(url) {
+            try {
+                const response = await fetch(url);
+                if (!response.ok) throw new Error('Failed to fetch tasks.');
+
+                const tasks = await response.json();
+                const todoListBody = document.getElementById('todo-list-body');
+                const completedListBody = document.getElementById('completed-list-body');
+
+                todoListBody.innerHTML = '';
+                completedListBody.innerHTML = '';
+
+                const todoTasks = tasks.filter(t => t.status !== 'COMPLETED');
+                const completedTasks = tasks.filter(t => t.status === 'COMPLETED');
+
+                if (todoTasks.length === 0 && completedTasks.length === 0) {
+                    todoListBody.innerHTML = '<div class="empty-task">No tasks found matching your criteria.</div>';
+                } else if (todoTasks.length > 0) {
+                    todoTasks.forEach(task => todoListBody.appendChild(createTaskElement(task)));
+                }
+
+                if (completedTasks.length === 0) {
+                    completedListBody.innerHTML = '<div class="empty-task small">No completed tasks found.</div>';
+                } else {
+                    completedTasks.forEach(task => completedListBody.appendChild(createTaskElement(task)));
+                }
+
+                if (window.FontAwesome) FontAwesome.dom.i2svg();
+            } catch (error) {
+                console.error(error);
+                alert(error.message);
+            }
+        }
+
+
+    });
 </script>

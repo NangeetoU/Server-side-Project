@@ -20,49 +20,43 @@ const UsersController = {
     },
 
     async getDashboardPage(req, res, next) {
-        try {
-            const userId = req.user.user_id;
+    try {
+        const userId = req.user.user_id;
 
-            const [notStartedTasks, inProgressTasks, completedTasksResult] = await Promise.all([
-                TasksModel.fillernotstarted(userId, {}),
-                TasksModel.fillerinprogress(userId, {}),
-                TasksModel.fillercompleted(userId, { orderBy: 'created_at', orderDir: 'DESC' })
-            ]);
+        // 👇 1. เพิ่ม stats และ TasksModel.countByStatus(userId) เข้ามาในนี้ 👇
+        const [notStartedTasks, inProgressTasks, completedTasksResult, stats] = await Promise.all([
+            TasksModel.fillernotstarted(userId, {}),
+            TasksModel.fillerinprogress(userId, {}),
+            TasksModel.fillercompleted(userId, { orderBy: 'created_at', orderDir: 'DESC' }),
+            TasksModel.countByStatus(userId)
+        ]);
 
-            let tasksToDo = [...notStartedTasks.data, ...inProgressTasks.data];
+        let tasksToDo = [...notStartedTasks.data, ...inProgressTasks.data];
 
-            // --- (สำคัญ) ส่วน Logic การเรียงลำดับใหม่ ---
-            const priorityMap = { 'EXTREME': 3, 'MODERATE': 2, 'LOW': 1 };
+        const priorityMap = { 'EXTREME': 3, 'MODERATE': 2, 'LOW': 1 };
+        tasksToDo.sort((a, b) => {
+            const dateA = a.due_at ? new Date(a.due_at) : null;
+            const dateB = b.due_at ? new Date(b.due_at) : null;
+            if (dateA && !dateB) return -1;
+            if (!dateA && dateB) return 1;
+            if (dateA && dateB && dateA !== dateB) return dateA - dateB;
+            const priorityA = priorityMap[a.priority] || 0;
+            const priorityB = priorityMap[b.priority] || 0;
+            return priorityB - priorityA;
+        });
 
-            tasksToDo.sort((a, b) => {
-                // 1. เรียงตาม due_at ก่อน (น้อยไปมาก)
-                const dateA = a.due_at ? new Date(a.due_at) : null;
-                const dateB = b.due_at ? new Date(b.due_at) : null;
+        res.render('dashboard', { 
+            title: 'Dashboard - DoDash',
+            user: req.user,
+            tasks: tasksToDo,
+            completedTasks: completedTasksResult.data,
+            stats: stats // 👇 2. เพิ่มบรรทัดนี้เพื่อส่ง stats ไปที่หน้าเว็บ 👇
+        });
 
-                if (dateA && !dateB) return -1; // a มีวันที่, b ไม่มี -> a มาก่อน
-                if (!dateA && dateB) return 1;  // a ไม่มีวันที่, b มี -> b มาก่อน
-                if (dateA && dateB) {
-                    if (dateA < dateB) return -1;
-                    if (dateA > dateB) return 1;
-                }
-
-                // 2. ถ้า due_at เหมือนกัน (หรือไม่มีทั้งคู่) ให้เรียงตาม priority (มากไปน้อย)
-                const priorityA = priorityMap[a.priority] || 0;
-                const priorityB = priorityMap[b.priority] || 0;
-                return priorityB - priorityA;
-            });
-
-            res.render('dashboard', { 
-                title: 'Dashboard - DoDash',
-                user: req.user,
-                tasks: tasksToDo,
-                completedTasks: completedTasksResult.data
-            });
-
-        } catch (error) {
-            next(error);
-        }
-    },
+    } catch (error) {
+        next(error);
+    }
+},
 
     async handleLogout(req, res) {
         // 1. สั่งให้เบราว์เซอร์ลบ Cookie ที่ชื่อ 'token' ทิ้ง
@@ -191,19 +185,7 @@ const UsersController = {
         }
     },
 
-    /**
-     * @description    (API) ลบผู้ใช้ที่ Login อยู่
-     * @route          DELETE /users/me (ตัวอย่าง)
-     */
-    async removeMe(req, res, next) {
-        try {
-            const ok = await UsersModel.remove(req.user.user_id);
-            if (!ok) return res.status(404).json({ error: 'User not found' });
-            res.status(204).end(); // ตอบกลับว่าสำเร็จแต่ไม่มีเนื้อหา
-        } catch (e) { 
-            next(e); 
-        }
-    }
+
 };
 
 module.exports = { UsersController };

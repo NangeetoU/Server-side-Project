@@ -294,6 +294,37 @@ body.dashboard-page {
     color: var(--highlight-yellow);
 }
 
+.dashboard-header .dropdown-menu {
+    background-color: var(--main-bg);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.dashboard-header .dropdown-menu .form-label {
+    color: var(--highlight-yellow);
+    font-size: 0.8rem;
+    font-weight: 500;
+    text-transform: uppercase;
+}
+
+.dashboard-header .dropdown-menu .form-select {
+    background-color: var(--dark-blue); 
+    color: #fff; 
+    border-color: #3a4a5e;
+}
+
+.dashboard-header .header-actions .action-btn:hover {
+    color: var(--highlight-yellow);
+    background-color: rgba(153, 136, 43, 0.1); 
+    border-radius: 50%;
+}
+
+.dashboard-header .dropdown-menu .dropdown-item:hover {
+    background-color: rgba(255, 215, 0, 0.2); 
+    color: var(--highlight-yellow);
+}
+
+
 .date-display {
     display: flex;
     flex-direction: column;
@@ -768,7 +799,7 @@ body.dashboard-page {
 /* 3. เมื่อ Hover ให้เป็นสีเหลืองอ่อน */
 .task-actions .dropdown-item:hover {
     background-color: var(--highlight-yellow-light);
-    color: var(--dark-blue);
+    color: var(--highlight-yellow);
 }
 
 /* 2. เมื่อ Active/Selected ให้เป็นสีเหลืองหลัก */

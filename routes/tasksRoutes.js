@@ -1,35 +1,34 @@
-// routes/tasksRoutes.js
+// routes/tasksRoutes.js (ฉบับทำความสะอาด)
 const express = require('express');
 const router = express.Router();
-
-const { requireUser } = require('../middleware/auth');
+const { requireUserApi } = require('../middleware/apiAuth');
 const { TasksController } = require('../controllers/tasksController');
 
-router.use(requireUser);
+// ใช้ middleware ป้องกันทุกเส้นทางในไฟล์นี้
+router.use(requireUserApi);
 
-// ---------- Dashboard & Search (static paths มาก่อน) ----------
-router.get('/dashboard',   TasksController.getdashboard);
-router.get('/search',      TasksController.search);
-router.get('/not-started', TasksController.getNotStarted);
-router.get('/in-progress', TasksController.getInProgress);
-router.get('/completed',   TasksController.getCompleted);
 
-// ---------- CRUD ----------
-// ใช้ RegExp เพื่อบังคับให้ id เป็นตัวเลขล้วน
-const reId        = /^\/(\d+)$/;
-const reIdStatus  = /^\/(\d+)\/status$/;
+// ---------- (คงไว้) Route สำหรับ Search โดยเฉพาะ ----------
+// จะถูกเรียกที่ URL: GET /tasks/search?q=...
+router.get('/search', TasksController.search);
 
-// helper: map capture group -> req.params.id
+// ---------- (คงไว้) Route สำหรับ Filter โดยเฉพาะ ----------
+// จะถูกเรียกที่ URL: GET /tasks/filter?status=... หรือ /tasks/filter?priority=...
+router.get('/filter', TasksController.filter);
+
+// ---------- Routes สำหรับ CRUD (เหมือนเดิม) ----------
+const reId       = /^\/(\d+)$/;
+const reIdStatus = /^\/(\d+)\/status$/;
+
 function mapRegexId(req, _res, next) {
-  // สำหรับเส้นทางแบบ RegExp, express จะใส่ค่าส่วนจับใน req.params[0], [1], ...
-  if (req.params && req.params[0]) req.params.id = req.params[0];
-  next();
+    if (req.params && req.params[0]) req.params.id = req.params[0];
+    next();
 }
 
-router.post('/',          TasksController.create);
-router.patch(reIdStatus,  mapRegexId, TasksController.patchStatus);
-router.get(reId,          mapRegexId, TasksController.getById);
-router.put(reId,          mapRegexId, TasksController.update);
-router.delete(reId,       mapRegexId, TasksController.remove);
+router.post('/',           TasksController.create);
+router.get(reId,           mapRegexId, TasksController.getById);
+router.put(reId,           mapRegexId, TasksController.update);
+router.delete(reId,        mapRegexId, TasksController.remove);
+router.patch(reIdStatus,   mapRegexId, TasksController.patchStatus);
 
 module.exports = router;

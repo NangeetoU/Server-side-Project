@@ -42,7 +42,14 @@
                     </div>
                 </div>
 
-                <button class="action-btn"><i class="fas fa-bell"></i></button>
+                <div class="dropdown">
+                    <button class="action-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="Notifications" id="notification-bell-btn">
+                        <i class="fas fa-bell"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end notification-dropdown" id="notification-dropdown-menu">
+                        <li class="p-3 text-center ">Loading notifications...</li>
+                    </ul>
+                </div>
                 <div class="date-display">
                     <span>Wednesday</span>
                     <span>24/09/2025</span>
@@ -385,6 +392,8 @@
                     </form>
                 </div>
                 <div class="modal-footer">
+                    <button type="button" class="btn btn-danger me-auto" id="deleteTaskBtn">Delete Task</button>
+
                     <button type="submit" form="editTaskForm" class="btn btn-done">Save Changes</button>
                 </div>
             </div>

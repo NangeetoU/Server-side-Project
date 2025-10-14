@@ -112,6 +112,7 @@
                     const addTaskModal = bootstrap.Modal.getInstance(document.getElementById('addTaskModal'));
                     addTaskModal.hide();
                     addTaskForm.reset();
+                    location.reload();
                 } catch (error) {
                     console.error('Error creating task:', error);
                     alert(`Error: ${error.message}`);
@@ -227,6 +228,7 @@
 
         const editTaskModalEl = document.getElementById('editTaskModal');
         const editTaskForm = document.getElementById('editTaskForm');
+        const deleteTaskBtn = document.getElementById('deleteTaskBtn');
         const editModal = new bootstrap.Modal(editTaskModalEl);
 
         // --- Logic ที่ 1: เมื่อคลิกที่ Task Item ---
@@ -290,6 +292,40 @@
 
             } catch (error) {
                 console.error('Error updating task:', error);
+                alert(error.message);
+            }
+        });
+        deleteTaskBtn.addEventListener('click', async () => {
+            // 1. ถามเพื่อยืนยันการลบ
+            if (!confirm('Are you sure you want to delete this task? This action cannot be undone.')) {
+                return; // ถ้าผู้ใช้กด Cancel, ให้หยุดทำงาน
+            }
+
+            // 2. ดึง task_id จาก hidden input ในฟอร์ม
+            const taskId = editTaskForm.querySelector('[name="task_id"]').value;
+            if (!taskId) {
+                alert('Could not find task ID.');
+                return;
+            }
+
+            try {
+                // 3. ยิง API ไปลบข้อมูล Task
+                const response = await fetch(`/tasks/${taskId}`, {
+                    method: 'DELETE'
+                });
+
+                if (!response.ok) {
+                    // response.ok จะเป็น false ถ้า HTTP status เป็น 4xx หรือ 5xx
+                    throw new Error('Failed to delete the task.');
+                }
+
+                // 4. ถ้าสำเร็จ: ปิด Modal, แจ้งเตือน, แล้วรีโหลดหน้าเว็บ
+                editModal.hide();
+                alert('Task deleted successfully.');
+                location.reload();
+
+            } catch (error) {
+                console.error('Error deleting task:', error);
                 alert(error.message);
             }
         });
@@ -395,6 +431,67 @@
                 alert(error.message);
             }
         }
+
+        // ==========================================================
+        // ส่วนที่ 7: โค้ดสำหรับ Notification Bell (แก้ไขแล้ว)
+        // ==========================================================
+        const notificationBellBtn = document.getElementById('notification-bell-btn');
+        const notificationMenu = document.getElementById('notification-dropdown-menu');
+        let notificationsLoaded = false;
+
+        notificationBellBtn.addEventListener('click', async () => {
+            if (notificationsLoaded) return;
+
+            notificationMenu.innerHTML = '<li class="p-3 text-center">Loading...</li>';
+
+            try {
+                const response = await fetch('/api/reminders');
+                if (!response.ok) throw new Error('Failed to load notifications.');
+
+                const reminders = await response.json();
+                notificationMenu.innerHTML = '';
+
+                if (reminders.length === 0) {
+                    notificationMenu.innerHTML = '<li class="p-3 text-center">No notifications.</li>';
+                    return;
+                }
+
+                reminders.forEach(reminder => {
+                    const li = document.createElement('li');
+                    let reminderTimeText = 'Invalid Date';
+
+                    if (reminder.remind_at) {
+                        // (สำคัญ) ซ่อมรูปแบบวันที่โดยการเปลี่ยนเว้นวรรคเป็น 'T'
+                        const isoDateTimeString = reminder.remind_at.replace(' ', 'T');
+                        const dateObj = new Date(isoDateTimeString);
+
+                        if (!isNaN(dateObj.getTime())) {
+                            reminderTimeText = dateObj.toLocaleString('en-US', {
+                                timeZone: 'Asia/Bangkok',
+                                month: 'short',
+                                day: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit'
+                            });
+                        }
+                    }
+
+                    li.innerHTML = `
+                        <a href="/task/${reminder.task_id}" class="notification-item">
+                            <p>Reminder for: <strong>${reminder.task_title}</strong></p>
+                            <small><i class="fas fa-clock"></i> ${reminderTimeText}</small>
+                        </a>
+                    `;
+                    notificationMenu.appendChild(li);
+                });
+
+                notificationsLoaded = true;
+
+            } catch (error) {
+                console.error('Error fetching notifications:', error);
+                notificationMenu.innerHTML = `<li class="p-3 text-center text-danger">${error.message}</li>`;
+            }
+        });
 
 
     });

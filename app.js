@@ -23,7 +23,7 @@ app.use(express.json());
 // --- Mount API routes FIRST ---
 app.use('/users', usersRoutes);   // -> /users/register, /users/login, /users/...
 app.use('/tasks', tasksRoutes);   // -> /tasks/...
-app.use('/reminders', remindersRoutes);
+app.use('/api/reminders', remindersRoutes);
 
 // --- Mount page routes LAST ---
 app.use('/', pageRoutes);         // -> หน้าเว็บปกติ เช่น '/', '/about', ฯลฯ

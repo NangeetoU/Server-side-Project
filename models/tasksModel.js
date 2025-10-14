@@ -56,11 +56,37 @@ const TasksModel = {
 
   //DELETE
   async remove(task_id, user_id) {
-    const [res] = await pool.execute(
-      `DELETE FROM tasks WHERE task_id = :task_id AND user_id = :user_id`,
-      { task_id, user_id }
-    );
-    return res.affectedRows > 0;
+      // สร้างการเชื่อมต่อแบบ Transaction เพื่อให้แน่ใจว่าถ้ามีอะไรผิดพลาด จะย้อนกลับได้ทั้งหมด
+      const connection = await pool.getConnection();
+      try {
+          await connection.beginTransaction();
+
+          // 1. ลบ "ลูก" (Reminders) ที่เกี่ยวข้องกับ task_id นี้ก่อน
+          await connection.execute(
+              `DELETE FROM reminders WHERE task_id = ?`,
+              [task_id]
+          );
+
+          // 2. จากนั้น ค่อยลบ "พ่อ" (Task)
+          const [res] = await connection.execute(
+              `DELETE FROM tasks WHERE task_id = ? AND user_id = ?`,
+              [task_id, user_id]
+          );
+
+          // ถ้าทุกอย่างสำเร็จ ให้ commit การเปลี่ยนแปลง
+          await connection.commit();
+
+          return res.affectedRows > 0;
+
+      } catch (error) {
+          // ถ้ามี Error เกิดขึ้น ให้ยกเลิกทุกอย่างที่ทำไป
+          await connection.rollback();
+          console.error('Failed to delete task and its reminders:', error);
+          throw error; // ส่ง Error ต่อไปให้ Controller จัดการ
+      } finally {
+          // คืนการเชื่อมต่อกลับสู่ Pool เสมอ
+          connection.release();
+      }
   },
 
   // PATCH status (PATCH /tasks/:id/status)

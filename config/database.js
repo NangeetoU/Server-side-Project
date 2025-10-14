@@ -10,7 +10,8 @@ const pool = mysql.createPool({
   database: process.env.DB_DATABASE || 'server_side',
   waitForConnections: true,
   connectionLimit: 10,
-  namedPlaceholders: true
+  namedPlaceholders: true,
+  timezone: '+00:00',
 });
 
 async function testConnection() {

@@ -1,10 +1,11 @@
 // routes/remindersRoutes.js
 const express = require('express');
 const router = express.Router();
-const { requireUser } = require('../middleware/auth');
+const { requireUserApi } = require('../middleware/apiAuth'); 
 const { RemindersController } = require('../controllers/remindersController');
 
-router.use(requireUser);
+
+router.use(requireUserApi); 
 
 router.post('/:taskId', RemindersController.createForTask); // Create
 router.get('/:taskId', RemindersController.getForTask);     // Read

@@ -976,6 +976,52 @@ body.dashboard-page {
     animation: fadeIn 0.5s ease-in-out;
 }
 
+/* (เพิ่มใหม่) สไตล์สำหรับ Notification Dropdown */
+.notification-dropdown {
+    width: 350px; /* ทำให้กล่องกว้างขึ้น */
+    max-height: 400px; /* จำกัดความสูงไม่ให้ยาวเกินไป */
+    overflow-y: auto; /* เพิ่ม scrollbar ถ้าเนื้อหายาว */
+    background-color: var(--main-bg);
+    border: 1px solid #3a4a5e;
+}
+
+.notification-item {
+    padding: 0.75rem 1.25rem;
+    border-bottom: 1px solid #3a4a5e;
+    display: block;
+    text-decoration: none;
+    color: #fff;
+}
+
+.notification-item strong {
+    color: var(--dark-blue); 
+}
+
+.notification-dropdown > li.text-center {
+    color: var(--highlight-yellow);
+}
+
+.notification-dropdown .text-danger {
+    color: var(--status-red) !important;
+}
+
+.notification-item:last-child {
+    border-bottom: none;
+}
+
+.notification-item:hover {
+    background-color: #aeb6c0;
+}
+
+.notification-item small {
+    color: var(--highlight-yellow);
+}
+
+.notification-item p {
+    margin: 0;
+    font-size: 0.9rem;
+}
+
 @keyframes fadeIn {
     from {
         opacity: 0;

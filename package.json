@@ -4,7 +4,7 @@
   "description": "Install ทั้งหมดนี้\r npm install express mysql2 dotenv ejs\r npm install --save-dev nodemon",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest"
   },
   "repository": {
     "type": "git",

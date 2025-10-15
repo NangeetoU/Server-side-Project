@@ -2,6 +2,9 @@
 Install ทั้งหมดนี้
 npm install express mysql2 dotenv ejs jsonwebtoken cookie-parser
 npm install --save-dev nodemon
+npm install node-cron
+npm i -D jest babel-jest
+
 
 Database ใช้ DBeaver
 สร้าง Database Connection

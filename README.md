@@ -11,7 +11,8 @@ Database ใช้ DBeaver
 เลือก MySql
 Database:server_side
 Password:12345678
-
+JWT_SECRET=superlongrandomsecretstring
+JWT_EXPIRES=24h
 
 วิธีการติดตั้ง
 ทำตามขั้นตอนต่อไปนี้เพื่อรันโปรเจกต์บนเครื่องของคุณ

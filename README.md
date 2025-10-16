@@ -11,8 +11,7 @@ Database ใช้ DBeaver
 เลือก MySql
 Database:server_side
 Password:12345678
-JWT_SECRET=superlongrandomsecretstring
-JWT_EXPIRES=24h
+
 
 วิธีการติดตั้ง
 ทำตามขั้นตอนต่อไปนี้เพื่อรันโปรเจกต์บนเครื่องของคุณ
@@ -44,6 +43,9 @@ DB_USER=root
 DB_PASSWORD=12345678
 DB_NAME=server_side
 DB_PORT=3306
+
+JWT_SECRET=superlongrandomsecretstring
+JWT_EXPIRES=24h
 
 ขั้นตอนที่ 4: ติดตั้งโปรแกรมเสริม
 ใช้คำสั่งนี้เพื่อติดตั้งแพ็คเกจที่จำเป็นทั้งหมด:

@@ -11,11 +11,11 @@ const ORDERABLE = new Set(['created_at', 'due_at', 'priority', 'title', 'status'
 const TasksModel = {
 
   //Create
-  async create({ user_id, title, description = null, image_url = null, status = 'NOT_STARTED', priority = 'LOW', due_at = null }) {
+  async create({ user_id, title, description =  null, status = 'NOT_STARTED', priority = 'LOW', due_at = null }) {
     const [res] = await pool.execute(
-      `INSERT INTO tasks (user_id, title, description, image_url, status, priority, due_at)
-       VALUES (:user_id, :title, :description, :image_url, :status, :priority, :due_at)`,
-      { user_id, title, description, image_url, status, priority, due_at }
+      `INSERT INTO tasks (user_id, title, description, status, priority, due_at)
+       VALUES (:user_id, :title, :description, :status, :priority, :due_at)`,
+      { user_id, title, description, status, priority, due_at }
     );
     return res.insertId;
   },
@@ -23,7 +23,7 @@ const TasksModel = {
   // READ by id 
   async findById(task_id, user_id) {
     const [rows] = await pool.execute(
-      `SELECT task_id, user_id, title, description, image_url, status, priority, due_at, created_at
+      `SELECT task_id, user_id, title, description, status, priority, due_at, created_at
          FROM tasks
         WHERE task_id = :task_id AND user_id = :user_id`,
       { task_id, user_id }
@@ -132,7 +132,7 @@ const TasksModel = {
 
     // ใช้ positional placeholders กับ LIMIT/OFFSET
     const [rows] = await pool.query(
-      `SELECT task_id, user_id, title, description, image_url, status, priority, due_at, created_at
+      `SELECT task_id, user_id, title, description, status, priority, due_at, created_at
          FROM tasks
         WHERE user_id = ? AND status = 'NOT_STARTED'
         ORDER BY ${col} ${dir}
@@ -156,7 +156,7 @@ const TasksModel = {
     const offset = Math.max(0, Math.trunc((Number(page) - 1) * limit));
 
     const [rows] = await pool.query(
-      `SELECT task_id, user_id, title, description, image_url, status, priority, due_at, created_at
+      `SELECT task_id, user_id, title, description, status, priority, due_at, created_at
          FROM tasks
         WHERE user_id = ? AND status = 'IN_PROGRESS'
         ORDER BY ${col} ${dir}
@@ -180,7 +180,7 @@ const TasksModel = {
     const offset = Math.max(0, Math.trunc((Number(page) - 1) * limit));
 
     const [rows] = await pool.query(
-      `SELECT task_id, user_id, title, description, image_url, status, priority, due_at, created_at
+      `SELECT task_id, user_id, title, description, status, priority, due_at, created_at
          FROM tasks
         WHERE user_id = ? AND status = 'COMPLETED'
         ORDER BY ${col} ${dir}
@@ -201,7 +201,7 @@ const TasksModel = {
     if (!queryText || !queryText.trim()) return [];
     const like = `%${queryText}%`;
     const [rows] = await pool.execute(
-      `SELECT task_id, user_id, title, description, image_url, status, priority, due_at, created_at
+      `SELECT task_id, user_id, title, description, status, priority, due_at, created_at
          FROM tasks
         WHERE user_id = :user_id
           AND title LIKE :like
